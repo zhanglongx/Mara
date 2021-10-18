@@ -42,8 +42,9 @@ def main():
         df = data.get(catalog=catlog)
 
         separate = True if 'separate' in t and t['separate'] else False
+        kind = t['kind'] if 'kind' in t else 'line'
 
-        p.draw(df, title=t['name'], separate=separate)
+        p.draw(df, title=t['name'], separate=separate, kind=kind)
 
     plt.show()
 
