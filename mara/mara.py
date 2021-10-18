@@ -1,4 +1,5 @@
 import re
+import warnings
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -17,6 +18,9 @@ class Data:
         elif isinstance(symbols, list):
             if len(symbols) > 2:
                 raise ValueError('symbols should be less than 2')
+            elif len(symbols) > 1: 
+                warnings.warn('symbols > 2, no compare')
+                compare = False
 
             self.symbols = symbols
         else:
