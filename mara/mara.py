@@ -18,7 +18,7 @@ class Data:
             self.symbols.append('002')
 
         self._reports = [pd.concat([genTest('CataA'), genTest('CataB')], axis=1) 
-                            for i in range(len(self.symbols))]
+                            for _ in range(len(self.symbols))]
 
         pass
 
@@ -26,8 +26,6 @@ class Data:
         """
         Return data (pd.Dataframe). axis[0] is time series, axis[1] is symbols.
         """
-
-        pd.DataFrame()
 
         if isinstance(catalog, dict) and len(catalog.keys()) > 1:
             raise ValueError('catalog length must be 1')
@@ -47,7 +45,7 @@ class Data:
         elif isinstance(catalog, dict):
             pass
         else:
-            raise TypeError('formulas type is not supported')
+            raise TypeError('formula type is not supported')
 
         # Hacks: 
         for k in catalog.keys():
