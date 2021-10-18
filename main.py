@@ -1,5 +1,4 @@
 import re
-from typing import Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -15,7 +14,11 @@ class Data:
         self.symbols = [symbol]
 
         # test only, tempz
-        self._reports = [pd.concat([genTest('CataA'), genTest('CataB')], axis=1)]
+        if compare == True:
+            self.symbols.append('002')
+
+        self._reports = [pd.concat([genTest('CataA'), genTest('CataB')], axis=1) 
+                            for i in range(len(self.symbols))]
 
         pass
 
@@ -27,7 +30,7 @@ class Data:
         pd.DataFrame()
 
         if isinstance(catalog, dict) and len(catalog.keys()) > 1:
-            raise ValueError("catalog length must be 1")
+            raise ValueError('catalog length must be 1')
 
         return pd.concat([self._formula(r, catalog=catalog) for r in self._reports], 
                             keys=self.symbols, axis=1)
@@ -66,9 +69,9 @@ class Plot:
     def __init__(self) -> None:
         pass
 
-    def draw(self, x1, x2, title, separate=True, kind='line'):
+    def draw(self, datas, title, separate=True, kind='line'):
 
-        df = pd.concat([x1, x2], axis=1)
+        df = pd.concat(datas, axis=1) if isinstance(datas, list) else datas
 
         if separate == False or len(df.columns) == 1:
             df.plot(title=title, kind=kind)
@@ -81,11 +84,6 @@ class Plot:
 
         return
 
-    def show(self):
-        plt.show()
-
-        return
-
 def genTest(catalog, date_start='1/1/2000'):
     ts = pd.Series(randn(5), index=date_range(date_start, periods=5))
     ts = ts.cumsum()
@@ -94,9 +92,10 @@ def genTest(catalog, date_start='1/1/2000'):
     return df.cumsum()
 
 if __name__ == '__main__':
-    d = Data('A')
-    df = d.get(dict(CataC='CataA - CataB'))
+    d = Data('001', compare=True)
+    df = d.get(dict(CataC='CataA + CataB'))
 
     p = Plot()
+    p.draw(df, title='CataC', separate=True, kind='line')
 
-    p.show()
+    plt.show()
