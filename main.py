@@ -16,8 +16,8 @@ def main():
     opt.add_argument('-c', '--compare', action='store_true', default=False, 
                         help='to compare with industry average')
     opt.add_argument('-t', '--template', type=str, default="mara.yaml",
-                        help='template file in .yml [mara.yaml]')
-    opt.add_argument('symbol', type=str, nargs='+', help='symbol input')
+                        help='template file in .yaml [mara.yaml]')
+    opt.add_argument('symbols', type=str, nargs='+', help='symbols input')
 
     arg = opt.parse_args()
 
@@ -30,7 +30,7 @@ def main():
         except yaml.YAMLError:
             fatal('parse template file error')
 
-    data = Data(arg.symbol, compare=arg.compare)
+    data = Data(arg.symbols, compare=arg.compare)
     p = Plot()
     for t in template['plots']:
         if not 'name' in t:
