@@ -1,0 +1,6 @@
+plots:
+  - name: 'CataA'
+    separate: true
+
+  - name: 'CataC'
+    formula: 'CataA - CataB'
