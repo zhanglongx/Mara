@@ -90,3 +90,12 @@ def genTest(catalog, date_start='1/1/2000'):
 
     df = pd.DataFrame(randn(5), index=ts.index, columns=[catalog])
     return df.cumsum()
+
+if __name__ == '__main__':
+    d = Data('001', compare=False)
+    df = d.get(dict(CataC='CataA + CataB'))
+
+    p = Plot()
+    p.draw(df, title='CataC', separate=True, kind='line')
+
+    plt.show()
