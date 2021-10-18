@@ -10,7 +10,6 @@ def fatal(*args):
     exit(1)
 
 def main():
-
     opt = argparse.ArgumentParser(description='Mara main program')
 
     opt.add_argument('-c', '--compare', action='store_true', default=False, 
@@ -41,6 +40,7 @@ def main():
 
         df = data.get(catalog=catlog)
 
+        # TODO: kwargs?
         separate = True if 'separate' in t and t['separate'] else False
         kind = t['kind'] if 'kind' in t else 'line'
 

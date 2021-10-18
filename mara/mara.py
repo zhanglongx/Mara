@@ -12,7 +12,6 @@ class Data:
     """
 
     def __init__(self, symbols, compare=False) -> None:
-
         if isinstance(symbols, str):
             self.symbols = [symbols]
         elif isinstance(symbols, list):
