@@ -10,8 +10,17 @@ class Data:
     Fetch the Data.
     """
 
-    def __init__(self, symbol: str, compare=False) -> None:
-        self.symbols = [symbol]
+    def __init__(self, symbols, compare=False) -> None:
+
+        if isinstance(symbols, str):
+            self.symbols = [symbols]
+        elif isinstance(symbols, list):
+            if len(symbols) > 2:
+                raise ValueError('symbols should be less than 2')
+
+            self.symbols = symbols
+        else:
+            raise TypeError('symbols type error')
 
         # test only, tempz
         if compare == True:
