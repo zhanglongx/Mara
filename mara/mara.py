@@ -18,7 +18,7 @@ class Data:
         elif isinstance(symbols, list):
             if len(symbols) > 2:
                 raise ValueError('symbols should be less than 2')
-            elif len(symbols) > 1: 
+            elif len(symbols) > 1 and compare == True: 
                 warnings.warn('symbols > 2, no compare')
                 compare = False
 
@@ -28,7 +28,7 @@ class Data:
 
         # test only, tempz
         if compare == True:
-            self.symbols.append('002')
+            self.symbols.append('100')
 
         self._reports = [pd.concat([genTest('CataA'), genTest('CataB')], axis=1) 
                             for _ in range(len(self.symbols))]
