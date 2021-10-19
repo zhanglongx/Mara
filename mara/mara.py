@@ -1,5 +1,6 @@
 import re
 import warnings
+import tushare as ts
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -11,7 +12,7 @@ class Data:
     Fetch the Data.
     """
 
-    def __init__(self, symbols, compare=False) -> None:
+    def __init__(self, symbols, token, compare=False) -> None:
         if isinstance(symbols, str):
             self.symbols = [symbols]
         elif isinstance(symbols, list):
@@ -25,12 +26,16 @@ class Data:
         else:
             raise TypeError('symbols type error')
 
-        # test only, tempz
-        if compare == True:
-            self.symbols.append('100')
+        self.token = token
 
-        self._reports = [pd.concat([genTest('CataA'), genTest('CataB')], axis=1) 
-                            for _ in range(len(self.symbols))]
+        # test only, tempz
+        # if compare == True:
+        #     self.symbols.append('100')
+
+        # self._reports = [pd.concat([genTest('CataA'), genTest('CataB')], axis=1) 
+        #                     for _ in range(len(self.symbols))]
+
+        self._fetch()
 
         pass
 
@@ -44,6 +49,18 @@ class Data:
 
         return pd.concat([self._formula(r, catalog=catalog) for r in self._reports], 
                             keys=self.symbols, axis=1)
+    
+    def _fetch(self) -> pd.DataFrame:
+        pro = ts.pro_api(self.token)
+
+        # TODO: check symbols
+
+        self._reports = []
+        for s in self.symbols:
+            arr = [pro.income(ts_code=s), pro.balancesheet(ts_code=s), pro.cashflow(ts_code=s)]
+            self._reports.append(pd.concat(arr, axis=1))
+
+        return
 
     def _formula(self, report, catalog=None):
         """
