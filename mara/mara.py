@@ -37,7 +37,7 @@ class Data:
 
         self._fetch()
 
-        pass
+        return
 
     def get(self, catalog, ttm=False) -> pd.DataFrame:
         """
@@ -94,7 +94,7 @@ class Plot:
     """
 
     def __init__(self) -> None:
-        pass
+        return
 
     def draw(self, datas, title, separate=True, **kwargs):
 
