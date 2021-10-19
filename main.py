@@ -34,19 +34,18 @@ def main():
     data = Data(arg.symbols, arg.token, compare=arg.compare)
     p = Plot()
     for t in template['plots']:
-        if not 'name' in t:
+        name = t.pop('name', None)
+        if name is None:
             warnings.warn('bad plot, no name')
             continue
 
-        catlog = t['name'] if not 'formula' in t else {t['name']:t['formula']}
+        _ = t.pop('formula', None)
+        catalog = name if _ is None else {name: _}
 
-        df = data.get(catalog=catlog)
+        df = data.get(catalog=catalog)
 
-        # TODO: kwargs?
-        separate = True if 'separate' in t and t['separate'] else False
-        kind = t['kind'] if 'kind' in t else 'line'
-
-        p.draw(df, title=t['name'], separate=separate, kind=kind)
+        separate = t.pop('separate', True)
+        p.draw(df, title=name, separate=separate, **t)
 
     plt.show()
 

@@ -96,18 +96,18 @@ class Plot:
     def __init__(self) -> None:
         pass
 
-    def draw(self, datas, title, separate=True, kind='line'):
+    def draw(self, datas, title, separate=True, **kwargs):
 
         df = pd.concat(datas, axis=1) if isinstance(datas, list) else datas
 
         if separate == False or len(df.columns) == 1:
-            df.plot(title=title, kind=kind)
+            df.plot(title=title, **kwargs)
 
         else:
             _, axes = plt.subplots(nrows=1, ncols=len(df.columns))
 
             for i, col in enumerate(df.columns):
-                df[col].plot(title=title, kind=kind, ax=axes[i])
+                df[col].plot(title=title, ax=axes[i], **kwargs)
 
         return
 
