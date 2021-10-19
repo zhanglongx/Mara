@@ -1,7 +1,0 @@
-plots:
-  - name: 'CataA'
-    separate: true
-    kind: 'bar'
-
-  - name: 'CataC'
-    formula: 'CataA - CataB'
