@@ -4,14 +4,19 @@ import tushare as ts
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from pandas import date_range
-from numpy.random import randn
-
 class Data:
     """
     Fetch the Data from tushare
+
+    Parameters
+    ---------
+    symbols: a string or list. same as ts_code
+    token: tushare token
+    compare: NOT supported now
+    start_date: tushare api start_date
     """
 
+    # TODO: compare
     def __init__(self, symbols, token, compare=False, start_date='20170101') -> None:
         if isinstance(symbols, str):
             self.symbols = [symbols]
@@ -29,20 +34,19 @@ class Data:
         self.token = token
         self.start_date = start_date
 
-        # test only, tempz
-        # if compare == True:
-        #     self.symbols.append('100')
-
-        # self._reports = [pd.concat([genTest('CataA'), genTest('CataB')], axis=1) 
-        #                     for _ in range(len(self.symbols))]
-
         self._fetch()
 
         return
 
+    # TODO: ttm
     def get(self, catalog, ttm=False) -> pd.DataFrame:
         """
         Return data (pd.Dataframe). axis[0] is time series, axis[1] is symbols.
+
+        Parameters
+        ----------
+        catalog: a string or dict. 
+        ttm: NOT supported now.
         """
 
         if isinstance(catalog, dict) and len(catalog.keys()) > 1:
@@ -105,6 +109,16 @@ class Plot:
         return
 
     def draw(self, datas, title, separate=True, **kwargs):
+        """
+        Draw the plot
+
+        Parameters
+        ----------
+        datas: a dataframe or list of dataframe
+        title: plot title
+        separate: if plot side-by-side
+        kwargs: passed to df.plot()
+        """
 
         df = pd.concat(datas, axis=1) if isinstance(datas, list) else datas
 
@@ -118,19 +132,3 @@ class Plot:
                 df[col].plot(title=title, ax=axes[i], **kwargs)
 
         return
-
-def genTest(catalog, date_start='1/1/2000'):
-    ts = pd.Series(randn(5), index=date_range(date_start, periods=5))
-    ts = ts.cumsum()
-
-    df = pd.DataFrame(randn(5), index=ts.index, columns=[catalog])
-    return df.cumsum()
-
-if __name__ == '__main__':
-    d = Data('001', compare=False)
-    df = d.get(dict(CataC='CataA + CataB'))
-
-    p = Plot()
-    p.draw(df, title='CataC', separate=True, kind='line')
-
-    plt.show()
