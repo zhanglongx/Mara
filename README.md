@@ -4,7 +4,7 @@ Mara is a plotting tool that takes data from tushare and plots it through matplo
 
 ## Usage
 
-1. Prepare TEMPLATE file:
+1. Prepare the TEMPLATE file:
 
 ```yaml
   global:
