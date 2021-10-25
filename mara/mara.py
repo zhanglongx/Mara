@@ -9,10 +9,10 @@ from numpy.random import randn
 
 class Data:
     """
-    Fetch the Data.
+    Fetch the Data from tushare
     """
 
-    def __init__(self, symbols, token, compare=False) -> None:
+    def __init__(self, symbols, token, compare=False, start_date='20170101') -> None:
         if isinstance(symbols, str):
             self.symbols = [symbols]
         elif isinstance(symbols, list):
@@ -27,6 +27,7 @@ class Data:
             raise TypeError('symbols type error')
 
         self.token = token
+        self.start_date = start_date
 
         # test only, tempz
         # if compare == True:
@@ -57,15 +58,22 @@ class Data:
 
         self._reports = []
         for s in self.symbols:
-            arr = [pro.income(ts_code=s), pro.balancesheet(ts_code=s), pro.cashflow(ts_code=s)]
-            self._reports.append(pd.concat(arr, axis=1))
+            df = pro.fina_indicator(ts_code=s, start_date=self.start_date)
+            df.set_index('end_date', inplace=True)
+
+            # remove duplicated row
+            df = df[~df.index.duplicated(keep='first')]
+
+            df.sort_index(inplace=True)
+
+            self._reports.append(df)
 
         return
 
     def _formula(self, report, catalog=None):
         """
         Calculate a report Dataframe based on formulas.
-        Hacks: using exec to formula, *DON't rename parameter 'report'*
+        Hacks: using exec to formula, *DON'T rename parameter 'report'*
         """
 
         if isinstance(catalog, str):
@@ -85,7 +93,7 @@ class Data:
 
             exec('report["%s"] = %s' % (left, right))
 
-        # tempz
+        # FIXME:
         return report[list(catalog.keys())[0]]
 
 class Plot:
