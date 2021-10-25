@@ -9,7 +9,7 @@ Mara is a plotting tool that takes data from tushare and plots it through matplo
 ```yaml
   global:
     # tushare token
-    token: 'f4673f7862e73483c5e65cd9a036eedd39e72d484194a85dabcf958b'
+    token: '<tushare token>'
 
   plots:
     # plot name. this field will also be used to lookup
