@@ -33,8 +33,11 @@ def main():
     token = globalSettings.pop('token', None)
     if token is None:
         fatal('global: missing token')
+
+    # FIXME: also for formulas
+    fields = [t['name'] for t in template['plots'] if 'name' in t]
     
-    data = Data(arg.symbols, token, compare=arg.compare)
+    data = Data(arg.symbols, token, fields=fields, compare=arg.compare)
 
     p = Plot()
     for t in template['plots']:

@@ -13,11 +13,12 @@ class Data:
     symbols: a string or list. same as ts_code
     token: tushare token
     compare: NOT supported now
+    fields: tushare fields
     start_date: tushare api start_date
     """
 
     # TODO: compare
-    def __init__(self, symbols, token, compare=False, start_date='20170101') -> None:
+    def __init__(self, symbols, token, compare=False, fields='', start_date='20160101') -> None:
         if isinstance(symbols, str):
             self.symbols = [symbols]
         elif isinstance(symbols, list):
@@ -31,7 +32,11 @@ class Data:
         else:
             raise TypeError('symbols type error')
 
+        if not isinstance(fields, list):
+            raise TypeError('fields type error')
+
         self.token = token
+        self.fields = fields
         self.start_date = start_date
 
         self._fetch()
@@ -56,13 +61,17 @@ class Data:
                             keys=self.symbols, axis=1)
     
     def _fetch(self) -> pd.DataFrame:
-        pro = ts.pro_api(self.token)
+        fields = self.fields
+        for t in ['ts_code', 'end_date']:
+            fields.append(t)
+
+        pro = ts.pro_api(token=self.token)
 
         # TODO: check symbols
 
         self._reports = []
         for s in self.symbols:
-            df = pro.fina_indicator(ts_code=s, start_date=self.start_date)
+            df = pro.fina_indicator(ts_code=s, fields=fields, start_date=self.start_date)
             df.set_index('end_date', inplace=True)
 
             # remove duplicated row
