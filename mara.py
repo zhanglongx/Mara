@@ -1,3 +1,4 @@
+import sys
 import os.path
 import runpy
 import warnings
@@ -23,10 +24,35 @@ class ConfigProtocol():
 
     __str__ = name
 
-    def init(self, api, ts_code, start_date=None, end_date=None, **kwargs):
+    def init(self, api, ts_code, start_date=None, end_date=None, **kwargs) -> None:
+        """
+        Initialize Cfg, all inherited *MUST* implement.
+        __init__ is already used by python module run. Here we define another
+        init() funcition to do the work.
+
+        api: tushare api
+        ts_code: list. tushare ts_code
+        start_date: tushare start_date
+        end_date: tushare end_date
+        """
+
         pass
 
-    def get(self) -> pd.DataFrame:
+    def get(self, ttm=False) -> pd.DataFrame:
+        """
+        Get the date, all inherited "MUST" implement.
+        It should return a dataframe with tow levels of columns.
+        The first level of columns being symbols and the second level 
+        being indicators, as:
+
+                      |           <symbol1>           |     <symbol 2>
+                      | <indicator 1> | <indicator 2> | 
+                       -----------------------------------------------
+        <time index>  |
+
+        ttm: whether use ttm
+        """
+
         pass
 
 def main():
@@ -69,14 +95,14 @@ def main():
                 template = yaml.safe_load(t)
             except yaml.error.YAMLError:
                 warnings.warn('cannot parse {}'.format(arg.template))
-    
+
     start_date = arg.start_date
     if start_date is not None:
-        start_date = parse(start_date).strftime('%Y-%m-%d') 
+        start_date = parse(start_date).strftime('%Y%m%d') 
 
     end_date = arg.end_date
     if end_date is not None:
-        end_date = parse(end_date).strftime('%Y-%m-%d')
+        end_date = parse(end_date).strftime('%Y%m%d')
 
     # load config modules
     mod = runpy.run_path(arg.CONFIG[0])
@@ -84,6 +110,9 @@ def main():
 
     for c in configlist:
         c.init(api, arg.SYMBOL, start_date=start_date, end_date=end_date, **template)
+        df = c.get()
+
+        df.to_csv(sys.stdout)
 
 if __name__ == '__main__':
     main()
