@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 import mara
 
-class Generic(mara.ConfigProtocol):
+class GenericCfg(mara.ConfigProtocol):
     """
     Generic config
     """
@@ -122,6 +122,3 @@ class Plot:
                 df[col].plot(title=title, ax=axes[i], **kwargs)
 
         return
-
-# tempz
-CONFIG=[Generic('indicator', ['longdeb_to_debt', 'ca_to_assets'])]
