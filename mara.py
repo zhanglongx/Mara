@@ -26,9 +26,11 @@ class ConfigProtocol():
 
     def init(self, api, ts_code, start_date=None, end_date=None, **kwargs) -> None:
         """
-        Initialize Cfg, all inherited *MUST* implement.
+        Initialize Cfg 
         __init__ is already used by python module run. Here we define another
         init() funcition to do the work.
+        normally, you should use super().init() in the inherited only, unless 
+        you want to perform some extra additional initialization 
 
         api: tushare api
         ts_code: list. tushare ts_code
@@ -36,7 +38,13 @@ class ConfigProtocol():
         end_date: tushare end_date
         """
 
-        pass
+        self.api = api
+
+        self.ts_code = ts_code
+
+        self.start_date = start_date
+        self.end_date   = end_date
+        return
 
     def get(self, ttm=False) -> pd.DataFrame:
         """
