@@ -26,12 +26,8 @@ class GenericCfg(mara.ConfigProtocol):
         self.fields = fields
 
     def init(self, api, ts_code, start_date=None, end_date=None, **kwargs) -> None:
-        self.api = api
-
-        self.ts_code = ts_code
-
-        self.start_date = start_date
-        self.end_date   = end_date
+        super().init(api, ts_code, start_date, end_date)
+        return
 
     # TODO: ttm
     def get(self, ttm=False) -> pd.DataFrame:
