@@ -64,7 +64,7 @@ def main():
                      help='tushare end_date')
     opt.add_argument('-t', '--template', type=str, 
                      help='template file in .yaml')
-    opt.add_argument('CONFIG', type=str, nargs=1, help='config filename') 
+    opt.add_argument('CONFIG', type=str, nargs=1, help='config .py filename') 
     opt.add_argument('SYMBOL', type=str, nargs='+', help='symbol list') 
 
     arg = opt.parse_args()
