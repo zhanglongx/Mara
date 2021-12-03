@@ -58,5 +58,7 @@ def main():
 
     return
 
+CONFIG=[Plot()]
+
 if __name__ == '__main__':
     main()
