@@ -9,7 +9,6 @@ class GenericCfg(mara.ConfigProtocol):
     Generic config
     """
 
-    # TODO: compare
     def __init__(self, indicator, fields) -> None:
         if indicator is None or not isinstance(indicator, str):
             raise ValueError('indicator should be one of tushare api')
@@ -33,7 +32,7 @@ class GenericCfg(mara.ConfigProtocol):
     def get(self, ttm=False) -> pd.DataFrame:
         # FIXME:
         if self.indicator != 'indicator':
-            raise ValueError
+            raise NotImplementedError()
 
         api = self.api.fina_indicator
 
@@ -44,6 +43,7 @@ class GenericCfg(mara.ConfigProtocol):
         else:
             fields = self.fields
 
+        # index using end_date
         fields.append('end_date')
 
         result = list()

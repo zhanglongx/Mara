@@ -6,7 +6,7 @@ class Dump(ConfigProtocol):
         print(api)
         print(ts_code)
 
-        print(kwargs.keys())
+        print(start_date)
         pass
 
     def get(self):

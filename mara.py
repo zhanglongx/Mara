@@ -34,8 +34,8 @@ class ConfigProtocol():
 
         api: tushare api
         ts_code: list. tushare ts_code
-        start_date: tushare start_date
-        end_date: tushare end_date
+        start_date: tushare start_date [%Y%m%d]
+        end_date: tushare end_date [%Y%m%d]
         """
 
         self.api = api
@@ -58,7 +58,7 @@ class ConfigProtocol():
                        -----------------------------------------------
         <time index>  |
 
-        ttm: whether use ttm
+        ttm: whether output ttm
         """
 
         pass
