@@ -12,7 +12,7 @@ from dateutil.parser import parse
 
 from utils.tushare import (lookup_ts_code)
 
-MARARC='/home/zhlx/.mararc'
+MARARC=os.path.join(os.path.expanduser('~'), '.mararc')
 
 class ConfigProtocol():
     """
