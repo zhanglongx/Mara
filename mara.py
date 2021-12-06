@@ -10,6 +10,8 @@ import tushare as ts
 
 from dateutil.parser import parse
 
+from utils.tushare import (lookup_ts_code)
+
 MARARC='/home/zhlx/.mararc'
 
 class ConfigProtocol():
@@ -33,9 +35,9 @@ class ConfigProtocol():
         you want to perform some extra additional initialization 
 
         api: tushare api
-        ts_code: list. tushare ts_code
-        start_date: tushare start_date [%Y%m%d]
-        end_date: tushare end_date [%Y%m%d]
+        ts_code: {list} tushare ts_code
+        start_date: {str} tushare start_date [%Y%m%d]
+        end_date: {str} tushare end_date [%Y%m%d]
         """
 
         self.api = api
@@ -58,7 +60,7 @@ class ConfigProtocol():
                        -----------------------------------------------
         <time index>  |
 
-        ttm: whether output ttm
+        ttm: {boolen} whether output ttm
         """
 
         pass
@@ -73,7 +75,8 @@ def main():
     opt.add_argument('-t', '--template', type=str, 
                      help='template file in .yaml')
     opt.add_argument('CONFIG', type=str, nargs=1, help='config .py filename') 
-    opt.add_argument('SYMBOL', type=str, nargs='+', help='symbol list') 
+    opt.add_argument('SYMBOL', type=str, nargs='+', 
+                     help='symbol list, can be one of ts_code, symbol, name') 
 
     arg = opt.parse_args()
 
@@ -116,8 +119,13 @@ def main():
     mod = runpy.run_path(arg.CONFIG[0])
     configlist = mod['CONFIG']
 
+    ts_code = lookup_ts_code(api, arg.SYMBOL)
+    if len(ts_code) == 0:
+        warnings.warn('cannot parse symbol {}'.format(arg.SYMBOL))
+        exit(1)
+
     for c in configlist:
-        c.init(api, arg.SYMBOL, start_date=start_date, end_date=end_date, **template)
+        c.init(api, ts_code, start_date=start_date, end_date=end_date, **template)
         df = c.get()
 
         df.to_csv(sys.stdout)
