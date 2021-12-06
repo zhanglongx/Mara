@@ -4,6 +4,30 @@ import matplotlib.pyplot as plt
 
 import mara
 
+def apiWrapper(api, ts_code, index, start_date, end_date, fields) -> pd.DataFrame:
+    """
+    apiWrapper is a simple wrapper around an tushare api. get the date
+    and then sets the index to 'end_date'
+    Exception: ValueError, if result is empty
+    """
+
+    if index is None or index == "":
+        raise ValueError('index is not given')
+    elif index not in fields:
+        fields.append(index)
+
+    df = api(ts_code=ts_code, start_date=start_date, end_date=end_date, fields=fields)
+    if df.empty:
+        raise ValueError
+
+    df.set_index(index, inplace=True)
+
+    # remove duplicated row
+    df = df[~df.index.duplicated(keep='first')]
+
+    df.sort_index(inplace=True)
+    return df
+
 class GenericCfg(mara.ConfigProtocol):
     """
     Generic config
@@ -38,24 +62,16 @@ class GenericCfg(mara.ConfigProtocol):
 
         if isinstance(self.fields, dict):
             fields = self.fields.keys()
-            # TODO: _formula()
+            # TODO: _formula(), note fields is list now!
             raise NotImplementedError()
         else:
             fields = self.fields
 
-        # index using end_date
-        fields.append('end_date')
-
         result = list()
         for s in self.ts_code:
-            df = api(ts_code=s, start_date=self.start_date, end_date=self.end_date, fields=fields)
-
-            df.set_index('end_date', inplace=True)
-
-            # remove duplicated row
-            df = df[~df.index.duplicated(keep='first')]
-
-            df.sort_index(inplace=True)
+            df = apiWrapper(api, ts_code=s, index='end_date',
+                            start_date=self.start_date, end_date=self.end_date, 
+                            fields=fields)
 
             result.append(df)
 
