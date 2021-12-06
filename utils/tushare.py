@@ -2,7 +2,11 @@ import warnings
 
 def lookup_ts_code(api, symbols):
     """
-    symbol: lookup keyword, may be one of ts_code, symbol, name
+    Lookup keyword, and return ts_code
+    symbols may be in one of ts_code, symbol, name
+
+    api: tushare api
+    symbols: {str, list} symbols to lookup
     """
 
     if isinstance(symbols, str):
