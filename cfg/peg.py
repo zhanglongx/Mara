@@ -30,7 +30,10 @@ class PEG(mara.ConfigProtocol):
                            fields=['q_profit_yoy'])
 
             g = g.median(0)[0]
-            peg = pe / g
+
+            peg = pe
+            peg['g'] = g
+            peg['peg'] = peg['pe'] / peg['g']
 
             result.append(peg)
 
