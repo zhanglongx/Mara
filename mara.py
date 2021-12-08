@@ -78,6 +78,8 @@ class ConfigProtocol():
 def main():
     opt = argparse.ArgumentParser(description='Mara main program')
 
+    opt.add_argument('-p', '--plot', action='store_true', default=False,
+                     help='to plot using')
     opt.add_argument('-s', '--start_date', type=str, 
                      help='tushare start_date')
     opt.add_argument('-e', '--end_date', type=str, 
@@ -140,7 +142,8 @@ def main():
 
         df.to_csv(sys.stdout)
 
-        c.plot()
+        if arg.plot:
+            c.plot()
 
 if __name__ == '__main__':
     main()
