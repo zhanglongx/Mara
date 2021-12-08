@@ -62,9 +62,16 @@ class ConfigProtocol():
 
         ttm: {boolen} whether output ttm
         """
+
         raise NotImplementedError()
 
     def plot(self) -> None:
+        """
+        Plot, all inherited can choose if to implement.
+        If impelmented, ensure it can be called directly, not
+        necessarily call get() first.
+        """
+
         warnings.warn('no plot implemented in inherited')
         pass
 
