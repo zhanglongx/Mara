@@ -1,6 +1,7 @@
 import re
 import pandas as pd
 import matplotlib.pyplot as plt
+import warnings
 
 import mara
 
@@ -33,7 +34,7 @@ class GenericCfg(mara.ConfigProtocol):
     Generic config
     """
 
-    def __init__(self, indicator, fields) -> None:
+    def __init__(self, indicator, fields, **kwargs) -> None:
         if indicator is None or not isinstance(indicator, str):
             raise ValueError('indicator should be one of tushare api')
 
@@ -47,6 +48,10 @@ class GenericCfg(mara.ConfigProtocol):
             raise ValueError('fields cannot be empty')
 
         self.fields = fields
+        self.plot_params = kwargs
+
+        # get will output here
+        self.df = None
 
     def init(self, api, ts_code, start_date=None, end_date=None, **kwargs) -> None:
         super().init(api, ts_code, start_date, end_date)
@@ -75,7 +80,8 @@ class GenericCfg(mara.ConfigProtocol):
 
             result.append(df)
 
-        return pd.concat(result, axis=1, keys=self.ts_code)
+        self.df = pd.concat(result, axis=1, keys=self.ts_code) 
+        return self.df
     
     def _formula(self, report, catalog=None):
         """
@@ -102,6 +108,23 @@ class GenericCfg(mara.ConfigProtocol):
 
         # FIXME:
         return report[list(catalog.keys())[0]]
+
+    def plot(self) -> None:
+        if self.plot_params is None:
+            plot_params = self.plot_params
+        else:
+            plot_params = dict()
+
+        if self.df is None:
+            warnings.warn('no dataframe, automatilly get...' )
+            self.get()
+
+        df = self.df
+        for f in df.columns.levels[1]:
+            kind = plot_params[f] if f in plot_params else 'line'
+
+            select = df.xs(f, axis=1, level=1)
+            select.plot(title=f, kind=kind)
 
 class Plot:
     """

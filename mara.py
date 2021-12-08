@@ -62,7 +62,10 @@ class ConfigProtocol():
 
         ttm: {boolen} whether output ttm
         """
+        raise NotImplementedError()
 
+    def plot(self) -> None:
+        warnings.warn('no plot implemented in inherited')
         pass
 
 def main():
@@ -129,6 +132,8 @@ def main():
         df = c.get()
 
         df.to_csv(sys.stdout)
+
+        c.plot()
 
 if __name__ == '__main__':
     main()
