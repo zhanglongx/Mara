@@ -126,6 +126,8 @@ class GenericCfg(mara.ConfigProtocol):
             select = df.xs(f, axis=1, level=1)
             select.plot(title=f, kind=kind)
 
+        plt.show()
+
 class Plot:
     """
     Plot the Figure.
