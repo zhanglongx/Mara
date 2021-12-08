@@ -127,35 +127,3 @@ class GenericCfg(mara.ConfigProtocol):
             select.plot(title=f, kind=kind)
 
         plt.show()
-
-class Plot:
-    """
-    Plot the Figure.
-    """
-
-    def __init__(self) -> None:
-        return
-
-    def draw(self, datas, title, separate=True, **kwargs):
-        """
-        Draw the plot
-
-        Parameters
-        ----------
-        datas: a dataframe or list of dataframe
-        title: plot title
-        separate: if plot side-by-side
-        kwargs: passed to df.plot()
-        """
-
-        df = pd.concat(datas, axis=1) if isinstance(datas, list) else datas
-
-        if separate == False or len(df.columns) == 1:
-            df.plot(title=title, **kwargs)
-        else:
-            _, axes = plt.subplots(nrows=1, ncols=len(df.columns))
-
-            for i, col in enumerate(df.columns):
-                df[col].plot(title=title, ax=axes[i], **kwargs)
-
-        return
