@@ -60,10 +60,12 @@ class GenericCfg(mara.ConfigProtocol):
     # TODO: ttm
     def get(self, ttm=False) -> pd.DataFrame:
         # FIXME:
-        if self.indicator != 'indicator':
+        if self.indicator == 'indicator':
+            api = self.api.fina_indicator
+        elif self.indicator == 'balancesheet':
+            api = self.api.balancesheet
+        else:
             raise NotImplementedError()
-
-        api = self.api.fina_indicator
 
         if isinstance(self.fields, dict):
             fields = self.fields.keys()
