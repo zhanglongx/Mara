@@ -60,7 +60,7 @@ class GenericCfg(mara.ConfigProtocol):
     # TODO: ttm
     def get(self, ttm=False) -> pd.DataFrame:
         # FIXME:
-        if self.indicator == 'indicator':
+        if self.indicator == 'fina_indicator':
             api = self.api.fina_indicator
         elif self.indicator == 'balancesheet':
             api = self.api.balancesheet
