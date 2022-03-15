@@ -34,7 +34,7 @@ class Recall:
     def Run(self) -> dict():
         price = ts.pro_bar(self.ts_code, api=self.pro, 
                             start_date=self.start_date, adj="hfq")
-        if price is None or price.empty():
+        if price is None or price.empty:
             raise ValueError("failed to get tushare pro_bar ts_code: {}, date: {}"\
                         .format(self.ts_code, self.start_date))
 
