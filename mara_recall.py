@@ -1,19 +1,17 @@
-import os
 import warnings
 import datetime
 import argparse
-import yaml
 
 import tushare as ts
 
 from utils.tushare import (lookup_ts_code)
+from utils.rc import (load_token)
 
-MARARC=os.path.join(os.path.expanduser("~"), ".mararc")
 DEFAULT_DAYS=60
 
 class Recall:
 
-    def __init__(self, token, ts_code, start_date, days=DEFAULT_DAYS) -> None:
+    def __init__(self, api, ts_code, start_date, days=DEFAULT_DAYS) -> None:
         if not isinstance(ts_code, str):
             raise TypeError
 
@@ -26,7 +24,7 @@ class Recall:
                 raise ValueError("start_date {} cannot be parsed"\
                                 .format(start_date))
 
-        self.pro = ts.pro_api(token=token)
+        self.pro = api
         self.ts_code = ts_code
         self.start_date = start_date 
         self.days = days
@@ -80,29 +78,18 @@ def main():
 
     arg = opt.parse_args()
 
-    # MARARC file
-    if not os.path.isfile(MARARC):
-        raise ValueError('{} not exists'.format(MARARC))
+    # token
+    token = load_token()
 
-    with open(MARARC, 'r') as r:
-        try:
-            rc = yaml.safe_load(r)
-        except yaml.error.YAMLError:
-            warnings.warn('cannot parse {}'.format(MARARC))
-            exit(1)
-
-    token = rc.pop("token", None)
-    if token is None:
-        warnings.warn('token is missing in {}'.format(MARARC))
-        exit(1)
+    api = ts.pro_api(token=token)
     
     # symbol
-    ts_code = lookup_ts_code(ts.pro_api(token), arg.SYMBOL[0])
+    ts_code = lookup_ts_code(api, arg.SYMBOL[0])
     if len(ts_code) == 0:
         warnings.warn('cannot parse symbol {}'.format(arg.SYMBOL))
         exit(1)
 
-    res = Recall(token, ts_code[0], arg.start_date, days=arg.days).Run()
+    res = Recall(api, ts_code[0], arg.start_date, days=arg.days).Run()
     print("{},{},{},{}".format(res["min_days"], res["min_pct"], 
                             res["max_days"], res["max_pct"]))
 

@@ -10,9 +10,8 @@ import tushare as ts
 
 from dateutil.parser import parse
 
+from utils.rc import (load_token)
 from utils.tushare import (lookup_ts_code)
-
-MARARC=os.path.join(os.path.expanduser('~'), '.mararc')
 
 class ConfigProtocol():
     """
@@ -92,21 +91,8 @@ def main():
 
     arg = opt.parse_args()
 
-    # MARARC file
-    if not os.path.isfile(MARARC):
-        raise ValueError('{} not exists'.format(MARARC))
-
-    with open(MARARC, 'r') as r:
-        try:
-            rc = yaml.safe_load(r)
-        except yaml.error.YAMLError:
-            warnings.warn('cannot parse {}'.format(MARARC))
-            exit(1)
-
-    token = rc.pop('token', None)
-    if token is None:
-        warnings.warn('token is missing in {}'.format(MARARC))
-        exit(1)
+    # token
+    token = load_token()
 
     api = ts.pro_api(token=token)
 
