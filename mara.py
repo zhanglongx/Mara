@@ -68,20 +68,37 @@ class ConfigProtocol():
         pass
 
 def main():
-    opt = argparse.ArgumentParser(description='Mara Symbols main program')
+    opt = argparse.ArgumentParser(description='Mara main program')
 
-    opt.add_argument('-c', '--column', type=str, 
-                    help='''
-                    print <column> only, from:
-                    'ts_code', 'symbol', 'name', 'area', 'industry', 'market', 'list_date' 
+    opt.add_argument('-c', '--column', type=str, default='symbol',
+                     help='''
+                     Use the specified <COLUMN> to match the <KEYWORD> 
+                     (by default 'symbol' column), <COLUMN> are from:
+                    'ts_code', 'symbol', 'name', 'area', 'industry', 'market', 'list_date'
                     ''')
     opt.add_argument('--header', action='store_true', default=False,
                     help='add header')
-    opt.add_argument('-m', '--match', type=str,
-                     help='''
-                     has the format: <column>:<match>,
-                     print the match only
+    opt.add_argument('-l', '--list', type=str,
+                    help='''
+                    list mode, print <LIST> column only, <LIST> are from:
+                    'ts_code', 'symbol', 'name', 'area', 'industry', 'market', 'list_date'.
+                    NOTE: The '-m' option will be ignored in the list mode
                     ''')
+    opt.add_argument('-m', '--module', type=str,
+                    help='''
+                    Using <MODULE> to get data. <MODULE> is the .py file the module implemented.
+                    If this option are specified, the built-in 'BASIC' module will be used.
+                    NOTE: This option will only take effect, either at least one keyword is contained,
+                    or list mode is not specified
+                    ''')
+    opt.add_argument('KEYWORD', type=str, nargs='*', 
+                     help='''
+                     keyword(s) to match. If more than one keyword is specified, then all matches
+                     will be output.
+                     If no keyword are specified, then only basic information will be outputted. 
+                     Which is for performance considerations.
+                     Meanwhile, the '-m' option will be ignored in this case
+                     ''') 
 
     arg = opt.parse_args()
 

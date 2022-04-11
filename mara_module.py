@@ -14,7 +14,7 @@ from utils.rc import (load_token)
 from utils.tushare import (lookup_ts_code)
 
 def main():
-    opt = argparse.ArgumentParser(description='Mara main program')
+    opt = argparse.ArgumentParser(description='Mara Module main program')
 
     opt.add_argument('-p', '--plot', action='store_true', default=False,
                      help='to plot using')
