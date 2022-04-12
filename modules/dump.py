@@ -1,6 +1,6 @@
-from mara import ConfigProtocol
+import mara
 
-class Dump(ConfigProtocol):
+class Dump(mara.ModuleProtocol):
 
     def init(self, api, ts_code, start_date=None, end_date=None, **kwargs) -> None:
         print(api)
@@ -12,4 +12,4 @@ class Dump(ConfigProtocol):
     def get(self):
         pass
 
-CONFIG=[Dump()]
+MODULE=[Dump()]

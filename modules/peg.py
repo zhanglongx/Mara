@@ -2,9 +2,9 @@ import mara
 
 import pandas as pd
 
-from cfg._generic import (apiWrapper)
+from modules._generic import (apiWrapper)
 
-class PEG(mara.ConfigProtocol):
+class PEG(mara.ModuleProtocol):
     """
     PEG
     """
@@ -19,13 +19,13 @@ class PEG(mara.ConfigProtocol):
     def get(self, ttm=False) -> pd.DataFrame:
         result = list()
         for s in self.ts_code:
-            pe = apiWrapper(self.api.daily_basic, ts_code=s, index='trade_date',
+            pe = apiWrapper(self.api.daily_basic, ts_code=s, index='ts_code',
                             start_date=self.start_date, end_date=self.end_date,
                             fields=['pe'])
             # TODO: more
             pe = pe.iloc[-1:]
             
-            g = apiWrapper(self.api.fina_indicator, ts_code=s, index='end_date',
+            g = apiWrapper(self.api.fina_indicator, ts_code=s, index='ts_code',
                            start_date=self.start_date, end_date=self.end_date,
                            fields=['q_profit_yoy'])
 
@@ -37,15 +37,6 @@ class PEG(mara.ConfigProtocol):
 
             result.append(peg)
 
-            # g = self._pro.fina_indicator(ts_code=self.ts_code, fields=['end_date', 'q_profit_yoy'])
-            # if g.empty:
-            #     raise ValueError
+        return pd.concat(result)
 
-            # print(pe)
-            # _ = g['q_profit_yoy'].to_csv('t.csv')
-            # print(pe['pe'][0], g['q_profit_yoy'].median())
-
-            # return pe['pe'][0] / g['q_profit_yoy'].median[0]
-        return pd.concat(result, axis=1, keys=self.ts_code)
-
-CONFIG=[PEG()]
+MODULE=[PEG()]

@@ -1,15 +1,16 @@
 import argparse
 import sys
+import warnings
+import runpy
 import pandas as pd
 import tushare as ts
-import warnings
 
 from utils.rc import (load_token)
 
-class ConfigProtocol():
+class ModuleProtocol():
     """
-    Interface that all source configs need to comply with.
-    Inspired by Beancount
+    interface that all source modules need to comply with.
+    inspired by Beancount
     """
 
     def name(self):
@@ -20,7 +21,7 @@ class ConfigProtocol():
 
     def init(self, api, ts_code, start_date=None, end_date=None, **kwargs) -> None:
         """
-        Initialize Cfg 
+        initialize module
         __init__ is already used by python module run. Here we define another
         init() funcition to do the work.
         normally, you should use super().init() in the inherited only, unless 
@@ -42,58 +43,87 @@ class ConfigProtocol():
 
     def get(self, ttm=False) -> pd.DataFrame:
         """
-        Get the date, all inherited "MUST" implement.
-        It should return a dataframe with tow levels of columns.
-        The first level of columns being symbols and the second level 
-        being indicators, as:
+        get the date, all inherited "MUST" implement.
+        it may return a dataframe with one or two levels of columns.
+        the first level of columns is indicator and the second level
+        (if have) is date, as:
 
-                      |           <symbol1>           |     <symbol 2>
-                      | <indicator 1> | <indicator 2> | 
-                       -----------------------------------------------
-        <time index>  |
+                                 |    <indicator1>    | <indicator2>
+                  (if presented) | <date 1> | <date2> | 
+                   -----------------------------------------------
+        <symbol>  |
 
-        ttm: {boolen} whether output ttm
+        ttm: {boolen} whether use ttm
         """
 
+        # only derived class
         raise NotImplementedError()
 
     def plot(self) -> None:
         """
-        Plot, all inherited can choose if to implement.
-        If impelmented, ensure it can be called directly, not
+        plot, all inherited can choose if to implement.
+        if impelmented, ensure it can be called directly, not
         necessarily call get() first.
         """
 
         warnings.warn('no plot implemented in inherited')
         pass
 
+# TODO: may make basic a module
+def basic(api, column='name', keywords=[]) -> pd.DataFrame:
+    info = api.stock_basic()
+
+    if len(keywords) == 0:
+        return info
+
+    result=[]
+    for k in keywords:
+        r = info[info[column].str.contains(k) == True]
+
+        if r.empty: 
+            raise ValueError('no keyword matched: {}'.format(k))
+
+        result.append(r)
+
+    return pd.concat(result).drop_duplicates().reset_index(drop=True)
+
 def main():
     opt = argparse.ArgumentParser(description='Mara main program')
 
-    opt.add_argument('-c', '--column', type=str, default='symbol',
+    opt.add_argument('-c', '--column', type=str, default='name',
                      help='''
-                     Use the specified <COLUMN> to match the <KEYWORD> 
-                     (by default 'symbol' column), <COLUMN> are from:
+                     use the specified <COLUMN> to match the <KEYWORD> 
+                     (by default 'name' column), <COLUMN> are from:
                     'ts_code', 'symbol', 'name', 'area', 'industry', 'market', 'list_date'
                     ''')
     opt.add_argument('--header', action='store_true', default=False,
                     help='add header')
-    opt.add_argument('-l', '--list', type=str,
+    opt.add_argument('--list', type=str,
                     help='''
                     list mode, print <LIST> column only, <LIST> are from:
                     'ts_code', 'symbol', 'name', 'area', 'industry', 'market', 'list_date'.
                     NOTE: The '-m' option will be ignored in the list mode
                     ''')
+    opt.add_argument('-l', '--lastest', type=str,
+                    help='print the latest only. Not all modules accept it')
     opt.add_argument('-m', '--module', type=str,
                     help='''
-                    Using <MODULE> to get data. <MODULE> is the .py file the module implemented.
-                    If this option are specified, the built-in 'BASIC' module will be used.
-                    NOTE: This option will only take effect, either at least one keyword is contained,
-                    or list mode is not specified
+                    use <MODULE> to get data. <MODULE> is the .py file the module implemented in.
+                    If this option are not specified, the built-in 'BASIC' module will be used.
+                    NOTE: This option will only take effect, if at least one keyword is contained,
+                    and list mode is not specified
+                    ''')
+    opt.add_argument('-s', '--start_date', type=str,
+                    help='''
+                    start date for module. Not all modules accept it
+                    ''')
+    opt.add_argument('-e', '--end_date', type=str,
+                    help='''
+                    end date for module. Not all modules accept it
                     ''')
     opt.add_argument('KEYWORD', type=str, nargs='*', 
                      help='''
-                     keyword(s) to match. If more than one keyword is specified, then all matches
+                     keyword(s) to match. If more than one keywords are specified, then all matches
                      will be output.
                      If no keyword are specified, then only basic information will be outputted. 
                      Which is for performance considerations.
@@ -102,29 +132,33 @@ def main():
 
     arg = opt.parse_args()
 
-    # token
-    token = load_token()
+    # initialize the api
+    api = ts.pro_api(token=load_token())
 
-    api = ts.pro_api(token=token)
+    basic_info = basic(api, arg.column, keywords=arg.KEYWORD)
 
-    info = api.stock_basic()
+    if not arg.list is None:
+        output = basic_info[arg.list]
+    # NOTE: keyword is suppressed for performance consideration, 
+    #       may removed further
+    elif not arg.module is None and len(arg.KEYWORD) != 0:
+        ts_codes = basic_info['ts_code'].to_list()
 
-    if arg.match is not None:
-        try:
-            [col_to_match, match] = arg.match.split(':')
-        except ValueError:
-            warnings.warn('input {} error'.format(arg.match))
-            exit(1)
+        if not arg.lastest is None:
+            raise NotImplemented('-l is not implemented')
 
-        info = info[info[col_to_match].str.contains(match) == True]
+        for m in runpy.run_path(arg.module)['MODULE']:
+            m.init(api, ts_codes, \
+                start_date=arg.start_date, 
+                end_date=arg.end_date)
 
-    if arg.column is None:
-        columns = None
+            df = m.get()
+
+            output = pd.merge(output, df, on='ts_code')
     else:
-        columns = [arg.column]
+        output = basic_info
 
-    info.to_csv(sys.stdout, index=False, header=arg.header, columns=columns)
-
+    output.to_csv(sys.stdout, index=False, header=arg.header)
 
 if __name__ == '__main__':
     main()

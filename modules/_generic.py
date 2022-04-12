@@ -5,31 +5,31 @@ import warnings
 
 import mara
 
-def apiWrapper(api, ts_code, index, start_date, end_date, fields) -> pd.DataFrame:
+def apiWrapper(api, ts_code, start_date, end_date, 
+            fields, date_col='end_date', latest=False) -> pd.DataFrame:
     """
-    apiWrapper is a simple wrapper around an tushare api. get the date
-    and then sets the index to 'end_date'
-    Exception: ValueError, if result is empty
+    apiWrapper is a simple wrapper around an tushare api. 
     """
-
-    if index is None or index == "":
-        raise ValueError('index is not given')
-    elif index not in fields:
-        fields.append(index)
+    if date_col not in fields:
+        fields.append(date_col)
 
     df = api(ts_code=ts_code, start_date=start_date, end_date=end_date, fields=fields)
     if df.empty:
         raise ValueError
 
-    df.set_index(index, inplace=True)
+    # df.set_index(index, inplace=True)
 
-    # remove duplicated row
-    df = df[~df.index.duplicated(keep='first')]
+    # # remove duplicated row
+    # df = df[~df.index.duplicated(keep='first')]
 
-    df.sort_index(inplace=True)
+    # df.sort_index(inplace=True)
+
+    # tempz    
+    import sys
+    df.to_csv(sys.stdout)
     return df
 
-class GenericCfg(mara.ConfigProtocol):
+class GenericMod(mara.ModuleProtocol):
     """
     Generic config
     """

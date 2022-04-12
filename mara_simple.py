@@ -4,7 +4,7 @@ import argparse
 
 import tushare as ts
 
-import cfg._generic as generic
+import modules._generic as generic
 
 from dateutil.parser import parse
 
@@ -51,7 +51,7 @@ def main():
         warnings.warn('cannot parse symbol {}'.format(arg.SYMBOL))
         exit(1)
 
-    g = generic.GenericCfg(api_name, fields)
+    g = generic.GenericMod(api_name, fields)
     g.init(api, ts_code, start_date=start_date, end_date=end_date)
 
     df = g.get()
