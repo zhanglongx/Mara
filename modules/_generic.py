@@ -7,27 +7,36 @@ import mara
 
 def apiWrapper(api, ts_code, start_date, end_date, 
             fields, date_col='end_date', latest=False) -> pd.DataFrame:
-    """
+    '''
     apiWrapper is a simple wrapper around an tushare api. 
-    """
+    and it will pivot to:
+
+                   |    <indicator1>    | <indicator2>
+                   | <date 1> | <date2> | 
+                    -----------------------------------------------
+        <ts_code>  |
+    '''
     if date_col not in fields:
         fields.append(date_col)
 
-    df = api(ts_code=ts_code, start_date=start_date, end_date=end_date, fields=fields)
+    if 'ts_code' not in fields:
+        fields.append('ts_code')
+    
+    df = api(ts_code=ts_code, start_date=start_date, end_date=end_date, 
+            fields=fields)
     if df.empty:
         raise ValueError
 
-    # df.set_index(index, inplace=True)
+    df = df.drop_duplicates().\
+            pivot(index='ts_code', columns=date_col).\
+            sort_index(axis=1, level=1)
 
-    # # remove duplicated row
-    # df = df[~df.index.duplicated(keep='first')]
+    if latest == True:
+        idx = pd.IndexSlice
 
-    # df.sort_index(inplace=True)
-
-    # tempz    
-    import sys
-    df.to_csv(sys.stdout)
-    return df
+        return df.loc[idx[:, idx[:, df.columns.get_level_values(1)[-1]]]]
+    else:
+        return df
 
 class GenericMod(mara.ModuleProtocol):
     """

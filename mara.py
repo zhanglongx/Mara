@@ -51,7 +51,7 @@ class ModuleProtocol():
                                  |    <indicator1>    | <indicator2>
                   (if presented) | <date 1> | <date2> | 
                    -----------------------------------------------
-        <symbol>  |
+        <ts_code>  |
 
         ttm: {boolen} whether use ttm
         """
@@ -113,13 +113,13 @@ def main():
                     NOTE: This option will only take effect, if at least one keyword is contained,
                     and list mode is not specified
                     ''')
-    opt.add_argument('-s', '--start_date', type=str,
+    opt.add_argument('-s', '--start_date', type=str, default='20170101',
                     help='''
-                    start date for module. Not all modules accept it
+                    start date [%%Y%%m%%d] for module. Not all modules accept it
                     ''')
     opt.add_argument('-e', '--end_date', type=str,
                     help='''
-                    end date for module. Not all modules accept it
+                    end date [%%Y%%m%%d] for module. Not all modules accept it
                     ''')
     opt.add_argument('KEYWORD', type=str, nargs='*', 
                      help='''
@@ -136,6 +136,7 @@ def main():
     api = ts.pro_api(token=load_token())
 
     basic_info = basic(api, arg.column, keywords=arg.KEYWORD)
+    output = basic_info
 
     if not arg.list is None:
         output = basic_info[arg.list]
@@ -155,8 +156,6 @@ def main():
             df = m.get()
 
             output = pd.merge(output, df, on='ts_code')
-    else:
-        output = basic_info
 
     output.to_csv(sys.stdout, index=False, header=arg.header)
 
