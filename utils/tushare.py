@@ -1,8 +1,14 @@
-from csv import field_size_limit
 import os
 import yaml
 
 MARARC=os.path.join(os.path.expanduser("~"), ".mararc")
+
+TS_CODE='ts_code'
+SYMBOL='symbol'
+NAME='name'
+AREA='area'
+INDUSTRY='industry'
+MARKET='market'
 
 def load_token(filename=MARARC) -> str:
     if not os.path.isfile(filename):

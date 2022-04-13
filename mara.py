@@ -5,7 +5,7 @@ import runpy
 import pandas as pd
 import tushare as ts
 
-from utils.rc import (load_token)
+import utils.tushare as uts
 
 class ModuleProtocol():
     """
@@ -70,7 +70,7 @@ class ModuleProtocol():
         pass
 
 # TODO: may make basic a module
-def basic(api, column='name', keywords=[]) -> pd.DataFrame:
+def basic(api, column=uts.NAME, keywords=[]) -> pd.DataFrame:
     info = api.stock_basic()
 
     if len(keywords) == 0:
@@ -90,7 +90,8 @@ def basic(api, column='name', keywords=[]) -> pd.DataFrame:
 def main():
     opt = argparse.ArgumentParser(description='Mara main program')
 
-    opt.add_argument('-c', '--column', type=str, default='name',
+    # FIXME: from uts enumerate
+    opt.add_argument('-c', '--column', type=str, default=uts.NAME,
                      help='''
                      use the specified <COLUMN> to match the <KEYWORD> 
                      (by default 'name' column), <COLUMN> are from:
@@ -133,7 +134,7 @@ def main():
     arg = opt.parse_args()
 
     # initialize the api
-    api = ts.pro_api(token=load_token())
+    api = ts.pro_api(token=uts.load_token())
 
     output = basic(api, arg.column, keywords=arg.KEYWORD)
 
@@ -142,7 +143,7 @@ def main():
     # NOTE: keyword is suppressed for performance consideration, 
     #       may removed further
     elif not arg.module is None and len(arg.KEYWORD) != 0:
-        ts_codes = output['ts_code'].to_list()
+        ts_codes = output[uts.TS_CODE].to_list()
 
         if not arg.lastest is None:
             raise NotImplemented('-l is not implemented')
@@ -154,7 +155,7 @@ def main():
 
             df = m.get(ttm=True)
 
-            output = pd.merge(output, df, on='ts_code')
+            output = pd.merge(output, df, on=uts.TS_CODE)
 
     output.to_csv(sys.stdout, index=False, header=arg.header)
 

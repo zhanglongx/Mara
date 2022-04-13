@@ -5,7 +5,7 @@ import argparse
 import tushare as ts
 
 from utils.tushare import (lookup_ts_code)
-from utils.rc import (load_token)
+from utils.tushare import (load_token)
 
 DEFAULT_DAYS=60
 

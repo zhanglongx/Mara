@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import warnings
 
 import mara
+import utils.tushare as uts
 
 def apiWrapper(api, ts_code, start_date, end_date, 
             fields, date_col='end_date', latest=False) -> pd.DataFrame:
@@ -23,8 +24,8 @@ def apiWrapper(api, ts_code, start_date, end_date,
     if date_col not in fields:
         fields.append(date_col)
 
-    if 'ts_code' not in fields:
-        fields.append('ts_code')
+    if uts.TS_CODE not in fields:
+        fields.append(uts.TS_CODE)
     
     # Exception: 抱歉，您每分钟最多访问该接口50次，
     # 权限的具体详情访问：https://tushare.pro/document/1?doc_id=108
@@ -44,7 +45,7 @@ def apiWrapper(api, ts_code, start_date, end_date,
         break
 
     df = df.drop_duplicates(subset=date_col, keep='first').\
-            pivot(index='ts_code', columns=date_col).\
+            pivot(index=uts.TS_CODE, columns=date_col).\
             sort_index(axis=1, level=1)
 
     if latest == True:

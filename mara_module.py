@@ -10,7 +10,7 @@ import tushare as ts
 
 from dateutil.parser import parse
 
-from utils.rc import (load_token)
+from utils.tushare import (load_token)
 from utils.tushare import (lookup_ts_code)
 
 def main():
