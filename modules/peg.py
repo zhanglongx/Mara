@@ -19,10 +19,12 @@ class PEG(mara.ModuleProtocol):
 
     def get(self, ttm=False) -> pd.DataFrame:
         result = list()
+
+        pe_field = 'pe_ttm' if ttm else 'pe'
         for s in self.ts_code:
             pe = apiWrapper(self.api.daily_basic, ts_code=s,
                             start_date=self.start_date, end_date=self.end_date,
-                            fields=['pe'], date_col='trade_date', latest=True)
+                            fields=[pe_field], date_col='trade_date', latest=True)
 
             g = apiWrapper(self.api.fina_indicator, ts_code=s,
                            start_date=self.start_date, end_date=self.end_date,
@@ -33,7 +35,7 @@ class PEG(mara.ModuleProtocol):
 
             peg = pe
             peg['g'] = g
-            peg['peg'] = peg['pe'] / g
+            peg['peg'] = peg[pe_field] / g
 
             result.append(peg)
 
