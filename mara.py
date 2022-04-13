@@ -8,10 +8,10 @@ import tushare as ts
 import utils.tushare as uts
 
 class ModuleProtocol():
-    """
+    '''
     interface that all source modules need to comply with.
     inspired by Beancount
-    """
+    '''
 
     def name(self):
         cls = self.__class__
@@ -20,7 +20,7 @@ class ModuleProtocol():
     __str__ = name
 
     def init(self, api, ts_code, start_date=None, end_date=None, **kwargs) -> None:
-        """
+        '''
         initialize module
         __init__ is already used by python module run. Here we define another
         init() funcition to do the work.
@@ -31,7 +31,7 @@ class ModuleProtocol():
         ts_code: {list} tushare ts_code
         start_date: {str} tushare start_date [%Y%m%d]
         end_date: {str} tushare end_date [%Y%m%d]
-        """
+        '''
 
         self.api = api
 
@@ -42,7 +42,7 @@ class ModuleProtocol():
         return
 
     def get(self, ttm=False) -> pd.DataFrame:
-        """
+        '''
         get the date, all inherited "MUST" implement.
         it may return a dataframe with one or two levels of columns.
         the first level of columns is indicator and the second level
@@ -54,17 +54,17 @@ class ModuleProtocol():
         <ts_code>  |
 
         ttm: {boolen} whether use ttm
-        """
+        '''
 
         # only derived class
         raise NotImplementedError()
 
     def plot(self) -> None:
-        """
+        '''
         plot, all inherited can choose if to implement.
         if impelmented, ensure it can be called directly, not
         necessarily call get() first.
-        """
+        '''
 
         warnings.warn('no plot implemented in inherited')
         pass
@@ -146,7 +146,7 @@ def main():
         ts_codes = output[uts.TS_CODE].to_list()
 
         if not arg.lastest is None:
-            raise NotImplemented('-l is not implemented')
+            raise NotImplemented('\'-l\' is not implemented')
 
         for m in runpy.run_path(arg.module)['MODULE']:
             m.init(api, ts_codes, \
