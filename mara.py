@@ -135,15 +135,14 @@ def main():
     # initialize the api
     api = ts.pro_api(token=load_token())
 
-    basic_info = basic(api, arg.column, keywords=arg.KEYWORD)
-    output = basic_info
+    output = basic(api, arg.column, keywords=arg.KEYWORD)
 
     if not arg.list is None:
-        output = basic_info[arg.list]
+        output = output[arg.list]
     # NOTE: keyword is suppressed for performance consideration, 
     #       may removed further
     elif not arg.module is None and len(arg.KEYWORD) != 0:
-        ts_codes = basic_info['ts_code'].to_list()
+        ts_codes = output['ts_code'].to_list()
 
         if not arg.lastest is None:
             raise NotImplemented('-l is not implemented')
@@ -153,7 +152,7 @@ def main():
                 start_date=arg.start_date, 
                 end_date=arg.end_date)
 
-            df = m.get()
+            df = m.get(ttm=True)
 
             output = pd.merge(output, df, on='ts_code')
 
