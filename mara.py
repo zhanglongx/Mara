@@ -3,7 +3,6 @@ import sys
 import warnings
 import runpy
 import pandas as pd
-import tushare as ts
 
 import utils.tushare as uts
 
@@ -19,7 +18,7 @@ class ModuleProtocol():
 
     __str__ = name
 
-    def init(self, api, ts_code, start_date=None, end_date=None, **kwargs) -> None:
+    def init(self, ts, ts_code, start_date=None, end_date=None, **kwargs) -> None:
         '''
         initialize module
         __init__ is already used by python module run. Here we define another
@@ -27,13 +26,13 @@ class ModuleProtocol():
         normally, you should use super().init() in the inherited only, unless 
         you want to perform some extra additional initialization 
 
-        api: tushare api
+        ts: utils.tushare.tsWrapper
         ts_code: {list} tushare ts_code
         start_date: {str} tushare start_date [%Y%m%d]
         end_date: {str} tushare end_date [%Y%m%d]
         '''
 
-        self.api = api
+        self.ts = ts
 
         self.ts_code = ts_code
 
@@ -70,8 +69,8 @@ class ModuleProtocol():
         pass
 
 # TODO: may make basic a module
-def basic(api, column=uts.NAME, keywords=[]) -> pd.DataFrame:
-    info = api.stock_basic()
+def basic(ts, column=uts.NAME, keywords=[]) -> pd.DataFrame:
+    info = ts.basic()
 
     if len(keywords) == 0:
         return info
@@ -134,9 +133,9 @@ def main():
     arg = opt.parse_args()
 
     # initialize the api
-    api = ts.pro_api(token=uts.load_token())
+    ts = uts.TsWrapper()
 
-    output = basic(api, arg.column, keywords=arg.KEYWORD)
+    output = basic(ts, arg.column, keywords=arg.KEYWORD)
 
     if not arg.list is None:
         output = output[arg.list]
@@ -149,7 +148,7 @@ def main():
             raise NotImplemented('\'-l\' is not implemented')
 
         for m in runpy.run_path(arg.module)['MODULE']:
-            m.init(api, ts_codes, \
+            m.init(ts, ts_codes, \
                 start_date=arg.start_date, 
                 end_date=arg.end_date)
 

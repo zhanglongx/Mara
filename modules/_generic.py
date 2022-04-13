@@ -1,59 +1,9 @@
 import re
-import time
 import pandas as pd
 import matplotlib.pyplot as plt
 import warnings
 
 import mara
-import utils.tushare as uts
-
-def apiWrapper(api, ts_code, start_date, end_date, 
-            fields, date_col='end_date', latest=False) -> pd.DataFrame:
-    '''
-    apiWrapper is a simple wrapper around an tushare api. 
-    and will pivot to:
-
-                   |    <indicator1>    | <indicator2>
-                   | <date 1> | <date2> | 
-                    -----------------------------------------------
-        <ts_code>  |
-
-    sometimes, tushare will have access restrictions to the api request,
-    apiWrapper will retry incase of exceptions returned
-    '''
-    if date_col not in fields:
-        fields.append(date_col)
-
-    if uts.TS_CODE not in fields:
-        fields.append(uts.TS_CODE)
-    
-    # Exception: 抱歉，您每分钟最多访问该接口50次，
-    # 权限的具体详情访问：https://tushare.pro/document/1?doc_id=108
-    for _ in range(3):
-        try:
-            # df :
-            # ts_code, <date_col>(descending), fields
-            df = api(ts_code=ts_code, start_date=start_date, end_date=end_date, 
-                    fields=fields)
-        except Exception:
-            time.sleep(60)
-            continue
-
-        if df.empty:
-            raise ValueError
-
-        break
-
-    df = df.drop_duplicates(subset=date_col, keep='first').\
-            pivot(index=uts.TS_CODE, columns=date_col).\
-            sort_index(axis=1, level=1)
-
-    if latest == True:
-        idx = pd.IndexSlice
-
-        return df.loc[idx[:, idx[:, df.columns.get_level_values(1)[-1]]]]
-    else:
-        return df
 
 class GenericMod(mara.ModuleProtocol):
     '''
@@ -87,9 +37,9 @@ class GenericMod(mara.ModuleProtocol):
     def get(self, ttm=False) -> pd.DataFrame:
         # FIXME:
         if self.indicator == 'fina_indicator':
-            api = self.api.fina_indicator
+            api = self.ts.fina_indicator
         elif self.indicator == 'balancesheet':
-            api = self.api.balancesheet
+            api = self.ts.balancesheet
         else:
             raise NotImplementedError()
 
