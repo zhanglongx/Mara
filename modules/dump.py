@@ -12,4 +12,4 @@ class Dump(mara.ModuleProtocol):
     def get(self):
         pass
 
-MODULE=[Dump()]
+MODULE=Dump()

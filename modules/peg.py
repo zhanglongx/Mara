@@ -39,4 +39,4 @@ class PEG(mara.ModuleProtocol):
 
         return pd.concat(result)
 
-MODULE=[PEG()]
+MODULE=PEG()

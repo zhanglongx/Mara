@@ -147,14 +147,20 @@ def main():
         if not arg.lastest is None:
             raise NotImplemented('\'-l\' is not implemented')
 
-        for m in runpy.run_path(arg.module)['MODULE']:
-            m.init(ts, ts_codes, \
-                start_date=arg.start_date, 
-                end_date=arg.end_date)
+        try:
+            # FIXME: 
+            m = runpy.run_path(arg.module)['MODULE']
+        except :
+            warnings.warn('load module {} failed'.format(arg.module))
+            exit(1)
 
-            df = m.get(ttm=True)
+        m.init(ts, ts_codes, \
+            start_date=arg.start_date, 
+            end_date=arg.end_date)
 
-            output = pd.merge(output, df, on=uts.TS_CODE)
+        df = m.get(ttm=True)
+
+        output = pd.merge(output, df, on=uts.TS_CODE)
 
     output.to_csv(sys.stdout, index=False, header=arg.header)
 

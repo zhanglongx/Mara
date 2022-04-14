@@ -23,10 +23,7 @@ class TsWrapper:
             raise FileNotFoundError('{} not exists'.format(filename))
 
         with open(filename, 'r') as r:
-            try:
-                rc = yaml.safe_load(r)
-            except yaml.error.YAMLError:
-                raise SyntaxError('cannot parse {}'.format(filename))
+            rc = yaml.safe_load(r)
 
         token = rc.pop("token", None)
         if token is None:
