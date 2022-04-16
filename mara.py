@@ -133,6 +133,10 @@ def main():
                     help='''
                     end date [%%Y%%m%%d] for module. Not all modules accept it
                     ''')
+    opt.add_argument('--no-ttm', action='store_true', default=False,
+                    help='''
+                    output ttm by default. it can be changed to no ttm
+                    ''')
     opt.add_argument('KEYWORD', type=str, nargs='*', 
                      help='''
                      keyword(s) to match. If more than one keywords are specified, then all matches
@@ -170,7 +174,7 @@ def main():
             start_date=arg.start_date, \
             end_date=arg.end_date)
 
-        df = m.get(ttm=True)
+        df = m.get(ttm=(not arg.no_ttm))
 
         arg.sort = len(output.columns) + arg.sort
 
