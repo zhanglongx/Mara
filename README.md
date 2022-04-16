@@ -1,6 +1,6 @@
 # Mara
 
-Mara is a plotting tool that takes data from tushare and plots it through matplotlib.
+Mara is an analysis and plotting tool that takes data from tushare and plots it through matplotlib.
 
 ## Usage
 
@@ -12,12 +12,13 @@ Mara is a plotting tool that takes data from tushare and plots it through matplo
 2. run mara.py
 
 ```bash
-	$ python mara.py [-t TEMPLATE] <cfg.py> symbols [symbols ...]
+	$ python3 mara.py [OPTIONS] [KEYWORD [KEYWORD ...]]
 ```
 Example:
 
 ```bash
-	$ python mara.py cfg/basic.py <symbols> [symbols ...]
+	# print all basic info
+	$ python3 mara.py
 ```
 
 ## About
