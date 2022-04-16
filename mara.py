@@ -1,6 +1,12 @@
 import argparse
 import sys
 import warnings
+
+from matplotlib.pyplot import axis
+
+# XXX:
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import runpy
 import pandas as pd
 
@@ -113,6 +119,13 @@ def main():
                     NOTE: This option will only take effect, if at least one keyword is contained,
                     and list mode is not specified
                     ''')
+    # FIXME: no hardcoded
+    opt.add_argument('--sort', type=int, default=0,
+                    help='''
+                    ascending sort of output by #<SORT> column. if module is specified, the sort 
+                    column start with the first column of module output, else start with the first
+                    column of basic
+                    ''')
     opt.add_argument('-s', '--start_date', type=str, default='20170101',
                     help='''
                     start date [%%Y%%m%%d] for module. Not all modules accept it
@@ -155,14 +168,20 @@ def main():
             exit(1)
 
         m.init(ts, ts_codes, \
-            start_date=arg.start_date, 
+            start_date=arg.start_date, \
             end_date=arg.end_date)
 
         df = m.get(ttm=True)
 
+        arg.sort = len(output.columns) + arg.sort
+
         output = pd.merge(output, df, on=uts.TS_CODE)
 
-    output.to_csv(sys.stdout, index=False, header=arg.header)
+    if arg.sort >= len(output.columns) or arg.sort < 0:
+        raise ValueError('sort on {} is out of range'.format(arg.sort))
+
+    output.sort_values(output.columns[arg.sort]).\
+        to_csv(sys.stdout, index=False, header=arg.header)
 
 if __name__ == '__main__':
     main()
