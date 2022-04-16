@@ -15,7 +15,7 @@ class PEG(mara.ModuleProtocol):
         super().init(ts, ts_code, start_date, end_date, **kwargs)
         return
 
-    def get(self, ttm=False) -> pd.DataFrame:
+    def get(self, latest=True, ttm=True, **kwargs) -> pd.DataFrame:
         result = list()
 
         pe_field = 'pe_ttm' if ttm else 'pe'

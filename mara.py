@@ -2,8 +2,6 @@ import argparse
 import sys
 import warnings
 
-from matplotlib.pyplot import axis
-
 # XXX:
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -46,7 +44,7 @@ class ModuleProtocol():
         self.end_date   = end_date
         return
 
-    def get(self, ttm=False) -> pd.DataFrame:
+    def get(self, latest=True, ttm=False, **kwargs) -> pd.DataFrame:
         '''
         get the date, all inherited "MUST" implement.
         it may return a dataframe with one or two levels of columns.
@@ -110,8 +108,6 @@ def main():
                     'ts_code', 'symbol', 'name', 'area', 'industry', 'market', 'list_date'.
                     NOTE: The '-m' option will be ignored in the list mode
                     ''')
-    opt.add_argument('-l', '--lastest', type=str,
-                    help='print on the latest date only. Not all modules accept it')
     opt.add_argument('-m', '--module', type=str,
                     help='''
                     use <MODULE> to get data. <MODULE> is the .py file the module implemented in.
@@ -119,17 +115,21 @@ def main():
                     NOTE: This option will only take effect, if at least one keyword is contained,
                     and list mode is not specified
                     ''')
+    opt.add_argument('-p', '--param', type=str,
+                    help='''
+                    some modules require input parameters, use this option to pass to the module
+                    ''')
     opt.add_argument('--sort', type=int, default=0,
                     help='''
                     ascending sort of output by #<SORT> column. if module is specified, the sort 
                     column start with the first column of module output, else start with the first
                     column of basic
                     ''')
-    opt.add_argument('-s', '--start_date', type=str, default='20170101',
+    opt.add_argument('-s', '--start-date', type=str, default='20170101',
                     help='''
                     start date [%%Y%%m%%d] for module. Not all modules accept it
                     ''')
-    opt.add_argument('-e', '--end_date', type=str,
+    opt.add_argument('-e', '--end-date', type=str,
                     help='''
                     end date [%%Y%%m%%d] for module. Not all modules accept it
                     ''')
@@ -137,6 +137,8 @@ def main():
                     help='''
                     output ttm by default. it can be changed to no ttm
                     ''')
+    opt.add_argument('--no-latest', action='store_true', default=False,
+                    help='print all, not only the latest date. Not all modules accept it')
     opt.add_argument('KEYWORD', type=str, nargs='*', 
                      help='''
                      keyword(s) to match. If more than one keywords are specified, then all matches
@@ -160,21 +162,21 @@ def main():
     elif not arg.module is None and len(arg.KEYWORD) != 0:
         ts_codes = output[uts.TS_CODE].to_list()
 
-        if not arg.lastest is None:
-            raise NotImplemented('\'-l\' is not implemented')
-
         try:
             # FIXME: 
             m = runpy.run_path(arg.module)['MODULE']
         except :
-            warnings.warn('load module {} failed'.format(arg.module))
-            exit(1)
+           warnings.warn('load module {} failed'.format(arg.module))
+           exit(1)
 
         m.init(ts, ts_codes, \
             start_date=arg.start_date, \
             end_date=arg.end_date)
 
-        df = m.get(ttm=(not arg.no_ttm))
+        # FIXME: hard-cored
+        df = m.get(latest=(not arg.no_latest), 
+                ttm=(not arg.no_ttm), 
+                **{'param': arg.param})
 
         arg.sort = len(output.columns) + arg.sort
 
