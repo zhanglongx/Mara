@@ -69,7 +69,7 @@ class TsWrapper:
                 continue
 
             if df.empty:
-                raise ValueError
+                raise ValueError('{}: {} is empty'.format(ts_code, api))
 
             break
 

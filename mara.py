@@ -111,7 +111,7 @@ def main():
                     NOTE: The '-m' option will be ignored in the list mode
                     ''')
     opt.add_argument('-l', '--lastest', type=str,
-                    help='print the latest only. Not all modules accept it')
+                    help='print on the latest date only. Not all modules accept it')
     opt.add_argument('-m', '--module', type=str,
                     help='''
                     use <MODULE> to get data. <MODULE> is the .py file the module implemented in.
@@ -119,7 +119,6 @@ def main():
                     NOTE: This option will only take effect, if at least one keyword is contained,
                     and list mode is not specified
                     ''')
-    # FIXME: no hardcoded
     opt.add_argument('--sort', type=int, default=0,
                     help='''
                     ascending sort of output by #<SORT> column. if module is specified, the sort 
@@ -177,11 +176,14 @@ def main():
 
         output = pd.merge(output, df, on=uts.TS_CODE)
 
-    if arg.sort >= len(output.columns) or arg.sort < 0:
-        raise ValueError('sort on {} is out of range'.format(arg.sort))
+    # sort
+    if arg.list is None:
+        if (arg.sort >= len(output.columns) or arg.sort < 0):
+            raise ValueError('sort on {} is out of range'.format(arg.sort))
 
-    output.sort_values(output.columns[arg.sort]).\
-        to_csv(sys.stdout, index=False, header=arg.header)
+        output = output.sort_values(output.columns[arg.sort])
+
+    output.to_csv(sys.stdout, index=False, header=arg.header)
 
 if __name__ == '__main__':
     main()
