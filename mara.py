@@ -104,10 +104,9 @@ def main():
                     ''')
     opt.add_argument('--header', action='store_true', default=False,
                     help='add header')
-    opt.add_argument('--list', type=str,
+    opt.add_argument('--list', action='store_true', default=False,
                     help='''
-                    list mode, print <LIST> column only, <LIST> are from:
-                    'ts_code', 'symbol', 'name', 'area', 'industry', 'market', 'list_date'.
+                    list mode, print <COLUMN> only, <COLUMN> is specified by '-c'.
                     NOTE: The '-m' option will be ignored in the list mode
                     ''')
     opt.add_argument('-m', '--module', type=str,
@@ -160,7 +159,7 @@ def main():
     output = basic(ts, arg.column, keywords=arg.KEYWORD)
 
     if not arg.list is None:
-        output = output[arg.list]
+        output = output[arg.column]
     # NOTE: keyword is suppressed for performance consideration, 
     #       may removed further
     elif not arg.module is None and len(arg.KEYWORD) != 0:
