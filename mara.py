@@ -8,6 +8,7 @@ __version__ = '1.1.0'
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import runpy
+import datetime
 import pandas as pd
 
 import utils.tushare as uts
@@ -92,6 +93,15 @@ def basic(ts, column=uts.NAME, keywords=[]) -> pd.DataFrame:
 
     return pd.concat(result).drop_duplicates().reset_index(drop=True)
 
+def check_date(s) -> None:
+    # FIXME: check date now
+    if not s is None:
+        try:
+            _ = datetime.datetime.strptime(s, '%Y%m%d')
+        except:
+            warnings.warn('{} is in wrong format'.format(s))
+            exit(1)
+
 def main():
     opt = argparse.ArgumentParser(description='Mara main program')
 
@@ -150,6 +160,10 @@ def main():
                      ''') 
 
     arg = opt.parse_args()
+
+    # date valid
+    check_date(arg.start_date)
+    check_date(arg.end_date)
 
     # initialize the api
     ts = uts.TsWrapper()
