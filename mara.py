@@ -187,7 +187,8 @@ def main():
         output = pd.merge(output, df, on=uts.TS_CODE)
 
     # sort
-    if arg.list is None:
+    # FIXME: remove restrictions on list?
+    if arg.list != True:
         if (arg.sort >= len(output.columns) or arg.sort < 0):
             raise ValueError('sort on {} is out of range'.format(arg.sort))
 
