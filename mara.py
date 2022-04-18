@@ -2,6 +2,8 @@ import argparse
 import sys
 import warnings
 
+__version__ = "1.0.2"
+
 # XXX:
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -139,12 +141,14 @@ def main():
                     ''')
     opt.add_argument('--no-latest', action='store_true', default=False,
                     help='print all, not only the latest date. Not all modules accept it')
+    opt.add_argument('-v', '--version', action='version',
+                    version='%(prog)s {}'.format(__version__))
     opt.add_argument('KEYWORD', type=str, nargs='*', 
                      help='''
                      keyword(s) to match. If more than one keywords are specified, then all matches
                      will be output.
                      If no keyword are specified, then only basic information will be outputted. 
-                     Which is for performance considerations.
+                     This is for performance considerations.
                      Meanwhile, the '-m' option will be ignored in this case
                      ''') 
 
