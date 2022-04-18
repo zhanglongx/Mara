@@ -185,6 +185,9 @@ def main():
         arg.sort = len(output.columns) + arg.sort
 
         output = pd.merge(output, df, on=uts.TS_CODE)
+    else:
+        # XXX: 'basic' module
+        pass
 
     # sort
     # FIXME: remove restrictions on list?
