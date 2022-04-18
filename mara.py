@@ -2,7 +2,7 @@ import argparse
 import sys
 import warnings
 
-__version__ = '1.0.2'
+__version__ = '1.1.0'
 
 # XXX:
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -177,7 +177,7 @@ def main():
             start_date=arg.start_date, \
             end_date=arg.end_date)
 
-        # FIXME: hard-cored
+        # FIXME: hard-coded
         df = m.get(latest=(not arg.no_latest), 
                 ttm=(not arg.no_ttm), 
                 **{'param': arg.param})
