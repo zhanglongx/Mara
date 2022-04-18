@@ -95,13 +95,11 @@ def basic(ts, column=uts.NAME, keywords=[]) -> pd.DataFrame:
 def main():
     opt = argparse.ArgumentParser(description='Mara main program')
 
-    # FIXME: from uts enumerate
     opt.add_argument('-c', '--column', type=str, default=uts.NAME,
                      help='''
                      use the specified <COLUMN> to match the <KEYWORD> 
-                     (by default 'name' column), <COLUMN> are from:
-                    'ts_code', 'symbol', 'name', 'area', 'industry', 'market', 'list_date'
-                    ''')
+                     (by default 'name' column), <COLUMN> are from: {}
+                    '''.format(', '.join(uts.COLUMNS)))
     opt.add_argument('--header', action='store_true', default=False,
                     help='add header')
     opt.add_argument('--list', action='store_true', default=False,
@@ -156,9 +154,12 @@ def main():
     # initialize the api
     ts = uts.TsWrapper()
 
+    if not arg.column in uts.COLUMNS:
+        raise ValueError('{} not in {}'.format(arg.column, ','.join(uts.COLUMNS)))
+
     output = basic(ts, arg.column, keywords=arg.KEYWORD)
 
-    if not arg.list is None:
+    if arg.list == True:
         output = output[arg.column]
     # NOTE: keyword is suppressed for performance consideration, 
     #       may removed further

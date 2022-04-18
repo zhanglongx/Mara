@@ -13,6 +13,8 @@ AREA='area'
 INDUSTRY='industry'
 MARKET='market'
 
+COLUMNS = [TS_CODE, SYMBOL, NAME, AREA, INDUSTRY, MARKET]
+
 class TsWrapper:
     def __init__(self, filename=MARARC) -> None:
         '''
