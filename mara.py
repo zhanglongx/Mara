@@ -116,7 +116,7 @@ def main():
                     ''')
     opt.add_argument('-p', '--param', type=str,
                     help='''
-                    some modules require input parameters, use this option to pass to the module
+                    some modules require input parameters, use this option to pass it to the module
                     ''')
     opt.add_argument('--sort', type=int, default=0,
                     help='''
