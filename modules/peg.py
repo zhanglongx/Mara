@@ -2,11 +2,11 @@ import mara
 import pandas as pd
 
 class PEG(mara.ModuleProtocol):
-    """
+    '''
     PEG
 
     output pe, g, peg
-    """
+    '''
 
     def __init__(self) -> None:
         pass

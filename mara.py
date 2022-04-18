@@ -2,7 +2,7 @@ import argparse
 import sys
 import warnings
 
-__version__ = "1.0.2"
+__version__ = '1.0.2'
 
 # XXX:
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -48,7 +48,7 @@ class ModuleProtocol():
 
     def get(self, latest=True, ttm=False, **kwargs) -> pd.DataFrame:
         '''
-        get the date, all inherited "MUST" implement.
+        get the date, all inherited 'MUST' implement.
         it may return a dataframe with one or two levels of columns.
         the first level of columns is indicator and the second level
         (if have) is date, as:

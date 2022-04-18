@@ -4,7 +4,7 @@ import time
 import tushare as ts
 import pandas as pd
 
-MARARC=os.path.join(os.path.expanduser("~"), ".mararc")
+MARARC=os.path.join(os.path.expanduser('~'), '.mararc')
 
 TS_CODE='ts_code'
 SYMBOL='symbol'
@@ -27,7 +27,7 @@ class TsWrapper:
         with open(filename, 'r') as r:
             rc = yaml.safe_load(r)
 
-        token = rc.pop("token", None)
+        token = rc.pop('token', None)
         if token is None:
             raise SyntaxError('token is missing in {}'.format(filename))
 
