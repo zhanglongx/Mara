@@ -208,7 +208,6 @@ class GenericMod(mara.ModuleProtocol):
         super().init(ts, ts_code, start_date, end_date)
         return
 
-    # FIXME: ttm
     def get(self, latest=True, ttm=True, **kwargs) -> pd.DataFrame:
         name = None
         api_name = None
