@@ -124,9 +124,9 @@ def main():
                     NOTE: This option will only take effect, if at least one keyword is contained,
                     and list mode is not specified
                     ''')
-    opt.add_argument('-p', '--param', type=str,
+    opt.add_argument('-a', '--arg', type=str,
                     help='''
-                    some modules require input parameters, use this option to pass it to the module
+                    some modules require input arguments, use this option to pass it to the module
                     ''')
     opt.add_argument('--sort', type=int, default=0,
                     help='''
@@ -194,7 +194,7 @@ def main():
         # FIXME: hard-coded
         df = m.get(latest=(not arg.no_latest), 
                 ttm=(not arg.no_ttm), 
-                **{'param': arg.param})
+                **{'arg': arg.arg})
 
         arg.sort = len(output.columns) + arg.sort
 

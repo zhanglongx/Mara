@@ -213,7 +213,7 @@ class GenericMod(mara.ModuleProtocol):
         api_name = None
 
         if not kwargs is None:
-            name = kwargs.pop('param', None)
+            name = kwargs.pop('arg', None)
 
         if name is None:
             raise ValueError('no name specified')
