@@ -94,7 +94,6 @@ def basic(ts, column=uts.NAME, keywords=[]) -> pd.DataFrame:
     return pd.concat(result).drop_duplicates().reset_index(drop=True)
 
 def check_date(s) -> None:
-    # FIXME: check date now
     if not s is None:
         try:
             _ = datetime.datetime.strptime(s, '%Y%m%d')
@@ -136,11 +135,11 @@ def main():
                     ''')
     opt.add_argument('-s', '--start-date', type=str, default='20170101',
                     help='''
-                    start date [%%Y%%m%%d] for module. Not all modules accept it
+                    start date [%%Y%%m%%d] for module. All modules accept it
                     ''')
     opt.add_argument('-e', '--end-date', type=str,
                     help='''
-                    end date [%%Y%%m%%d] for module. Not all modules accept it
+                    end date [%%Y%%m%%d] for module. All modules accept it
                     ''')
     opt.add_argument('--no-ttm', action='store_true', default=False,
                     help='''
@@ -162,6 +161,7 @@ def main():
     arg = opt.parse_args()
 
     # date valid
+    # FIXME: date order
     check_date(arg.start_date)
     check_date(arg.end_date)
 
