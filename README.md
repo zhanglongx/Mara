@@ -4,7 +4,7 @@ Mara is an analysis and plotting tool that takes data from tushare and plots it 
 
 ## Usage
 
-1. Prepare the ~/.mararc file:
+1. Prepare the ~/.mararc file(yaml syntax):
 
 ```yaml
   token: '<tushare token>'
