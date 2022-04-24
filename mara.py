@@ -144,7 +144,7 @@ def main():
                     ''')
     opt.add_argument('--no-ttm', action='store_true', default=False,
                     help='''
-                    output ttm by default. it can be changed to no ttm
+                    output ttm by default. it can be changed to no ttm. Not all modules accept it
                     ''')
     opt.add_argument('--no-latest', action='store_true', default=False,
                     help='print all, not only the latest date. Not all modules accept it')
