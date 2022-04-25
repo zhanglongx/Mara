@@ -1,5 +1,6 @@
 import mara
 import pandas as pd
+import numpy as np
 
 class OCFPS(mara.ModuleProtocol):
     '''
@@ -27,8 +28,11 @@ class OCFPS(mara.ModuleProtocol):
                                 start_date=self.start_date, end_date=self.end_date,
                                 fields=['ocfps'], date_col='end_date', latest=False)
             
-            # type changed
-            ocfps = ocfps.groupby(axis=1, level=0).median().values[0]
+            if ocfps.empty:
+                ocfps = np.nan
+            else:
+                # type changed
+                ocfps = ocfps.groupby(axis=1, level=0).median().values[0]
 
             close['ocfps'] = ocfps
             close['ratio'] = ocfps / close['close']

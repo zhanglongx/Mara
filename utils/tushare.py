@@ -70,9 +70,6 @@ class TsWrapper:
                 time.sleep(60)
                 continue
 
-            if df.empty:
-                raise ValueError('{}: {} is empty'.format(ts_code, api))
-
             break
 
         df = df.drop_duplicates(subset=date_col, keep='first').\

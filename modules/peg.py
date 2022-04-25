@@ -1,5 +1,6 @@
 import mara
 import pandas as pd
+import numpy as np
 
 class PEG(mara.ModuleProtocol):
     '''
@@ -28,8 +29,11 @@ class PEG(mara.ModuleProtocol):
                            start_date=self.start_date, end_date=self.end_date,
                            fields=['q_profit_yoy'])
 
-            # type changed
-            g = g.groupby(axis=1, level=0).median().values[0]
+            if g.empty:
+                g = np.nan
+            else:
+                # type changed
+                g = g.groupby(axis=1, level=0).median().values[0]
 
             peg = pe
             peg['g'] = g
