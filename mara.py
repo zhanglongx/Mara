@@ -1,8 +1,10 @@
 import argparse
+import os
+import pathlib
 import sys
 import warnings
 
-__version__ = '1.1.0'
+__version__ = '1.1.2'
 
 # XXX:
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -101,6 +103,25 @@ def check_date(s) -> None:
             warnings.warn('{} is in wrong format'.format(s))
             exit(1)
 
+def export_filebase(arg) -> str:
+    schema = []
+    if arg.module is not None:
+        # Basename without <.ext>, see:
+        # https://stackoverflow.com/questions/678236/how-do-i-get-the-filename-without-the-extension-from-a-path-in-python
+        schema.append(pathlib.Path(arg.module).stem)
+    if arg.arg is not None:
+        schema.append(arg.arg)
+    if len(arg.KEYWORD) != 0:
+        # FIXME: only [0]?
+        schema.append(arg.KEYWORD[0])
+    
+    base = '_'.join(schema)
+    for i in range(1, 10):
+        if not os.path.exists(base + '_{}'.format(i)):
+            return base + '_{}'.format(i)
+
+    raise RuntimeError('cannot compose a suitable filename')
+
 def main():
     opt = argparse.ArgumentParser(description='Mara main program')
 
@@ -149,6 +170,12 @@ def main():
                     help='print all, not only the latest date. Not all modules accept it')
     opt.add_argument('-v', '--version', action='version',
                     version='%(prog)s {}'.format(__version__))
+    opt.add_argument('-x', '--excel', action='store_true', default=False,
+                    help='''
+                    export to excel, instead of stdout. 
+                    The file name has schema as: <module>_<arg>_<KEYWORD0>_<int>
+                    <int> is an auto-increment integer number
+                    ''')
     opt.add_argument('KEYWORD', type=str, nargs='*', 
                      help='''
                      keyword(s) to match. If more than one keywords are specified, then all matches
@@ -211,7 +238,11 @@ def main():
 
         output = output.sort_values(output.columns[arg.sort])
 
-    output.to_csv(sys.stdout, index=False, header=arg.header)
+    if arg.excel:
+        base = export_filebase(arg)
+        output.to_excel('{}.xlsx'.format(base), index=False, header=arg.header)
+    else:
+        output.to_csv(sys.stdout, index=False, header=arg.header)
 
 if __name__ == '__main__':
     main()
