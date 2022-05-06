@@ -4,7 +4,7 @@ import pathlib
 import sys
 import warnings
 
-__version__ = '1.1.2'
+__version__ = '1.2.1'
 
 # XXX:
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -117,8 +117,9 @@ def export_filebase(arg) -> str:
     
     base = '_'.join(schema)
     for i in range(1, 10):
-        if not os.path.exists(base + '_{}'.format(i)):
-            return base + '_{}'.format(i)
+        f = base + '_{}.xlsx'.format(i)
+        if not os.path.exists(f):
+            return f
 
     raise RuntimeError('cannot compose a suitable filename')
 
@@ -148,9 +149,14 @@ def main():
                     help='''
                     some modules require input arguments, use this option to pass it to the module
                     ''')
+    opt.add_argument('-p', '--plot', action='store_true', default=False,
+                    help='''
+                    use pd.plot.line() to plot. 
+                    NOTE: This option will only take effect, when '-m' option specified and take effect
+                    ''')
     opt.add_argument('--sort', type=int, default=0,
                     help='''
-                    ascending sort of output by #<SORT> column. if module is specified, the sort 
+                    ascending sort of output by #<SORT> column. If module is specified, the sort 
                     column start with the first column of module output, else start with the first
                     column of basic
                     ''')
@@ -164,7 +170,7 @@ def main():
                     ''')
     opt.add_argument('--no-ttm', action='store_true', default=False,
                     help='''
-                    output ttm by default. it can be changed to no ttm. Not all modules accept it
+                    output ttm by default. It can be changed to no ttm. Not all modules accept it
                     ''')
     opt.add_argument('--no-latest', action='store_true', default=False,
                     help='print all, not only the latest date. Not all modules accept it')
@@ -173,7 +179,7 @@ def main():
     opt.add_argument('-x', '--excel', action='store_true', default=False,
                     help='''
                     export to excel, instead of stdout. 
-                    The file name has schema as: <module>_<arg>_<KEYWORD0>_<int>
+                    The file name has the schema as: <module>_<arg>_<KEYWORD0>_<int>
                     <int> is an auto-increment integer number
                     ''')
     opt.add_argument('KEYWORD', type=str, nargs='*', 
@@ -226,6 +232,9 @@ def main():
         arg.sort = len(output.columns) + arg.sort
 
         output = pd.merge(output, df, on=uts.TS_CODE)
+
+        if arg.plot:
+            pass
     else:
         # XXX: 'basic' module
         pass
@@ -240,7 +249,7 @@ def main():
 
     if arg.excel:
         base = export_filebase(arg)
-        output.to_excel('{}.xlsx'.format(base), index=False, header=arg.header)
+        output.to_excel(base, index=False, header=arg.header)
     else:
         output.to_csv(sys.stdout, index=False, header=arg.header)
 
