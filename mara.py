@@ -12,6 +12,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import runpy
 import datetime
 import pandas as pd
+import matplotlib.pyplot as plt
 
 import utils.tushare as uts
 
@@ -67,15 +68,14 @@ class ModuleProtocol():
         # only derived class
         raise NotImplementedError()
 
-    def plot(self) -> None:
+    def plot(self, df: pd.DataFrame) -> None:
         '''
         plot, all inherited can choose if to implement.
-        if impelmented, ensure it can be called directly, not
-        necessarily call get() first.
+        if not implemented, the super provides a basic implement.
         '''
 
-        warnings.warn('no plot implemented in inherited')
-        pass
+        for c in df.columns.levels[0]:
+            df[c].transpose().plot(subplots=True, title=c)
 
 # TODO: may make basic a module
 def basic(ts, column=uts.NAME, keywords=[]) -> pd.DataFrame:
@@ -152,7 +152,8 @@ def main():
     opt.add_argument('-p', '--plot', action='store_true', default=False,
                     help='''
                     use pd.plot.line() to plot. 
-                    NOTE: This option will only take effect, when '-m' option specified and take effect
+                    It will automatically turn off '--no-latest'.
+                    NOTE: This option will only take effect, when '-m' option specified and take effect. 
                     ''')
     opt.add_argument('--sort', type=int, default=0,
                     help='''
@@ -224,6 +225,10 @@ def main():
             start_date=arg.start_date, \
             end_date=arg.end_date)
 
+        if arg.plot:
+            warnings.warn('\'-p\' specified, using \'--no-latest\'')
+            arg.no_latest = True
+
         # FIXME: hard-coded
         df = m.get(latest=(not arg.no_latest), 
                 ttm=(not arg.no_ttm), 
@@ -234,7 +239,9 @@ def main():
         output = pd.merge(output, df, on=uts.TS_CODE)
 
         if arg.plot:
-            pass
+            m.plot(df)
+
+            plt.show()
     else:
         # XXX: 'basic' module
         pass

@@ -42,5 +42,8 @@ class PEG(mara.ModuleProtocol):
             result.append(peg)
 
         return pd.concat(result)
+    
+    def plot(self, df: pd.DataFrame) -> None:
+        raise NotImplementedError
 
 MODULE=PEG()

@@ -41,4 +41,7 @@ class OCFPS(mara.ModuleProtocol):
 
         return pd.concat(result)
 
+    def plot(self, df: pd.DataFrame) -> None:
+        raise NotImplementedError
+
 MODULE=OCFPS()
