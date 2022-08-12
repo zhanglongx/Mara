@@ -1,17 +1,13 @@
-import warnings
 import datetime
 import argparse
 
-import tushare as ts
-
-from utils.tushare import (lookup_ts_code)
-from utils.tushare import (load_token)
+import utils.tushare as uts
 
 DEFAULT_DAYS=60
 
 class Recall:
 
-    def __init__(self, api, ts_code, start_date, days=DEFAULT_DAYS) -> None:
+    def __init__(self, ts, ts_code, start_date, days=DEFAULT_DAYS) -> None:
         if not isinstance(ts_code, str):
             raise TypeError
 
@@ -24,14 +20,15 @@ class Recall:
                 raise ValueError("start_date {} cannot be parsed"\
                                 .format(start_date))
 
-        self.pro = api
+        self.ts = ts
         self.ts_code = ts_code
         self.start_date = start_date 
         self.days = days
 
     def Run(self) -> dict():
-        price = ts.pro_bar(self.ts_code, api=self.pro, 
-                            start_date=self.start_date, adj="hfq")
+        price = self.ts.pro_bar(ts_code=self.ts_code, 
+                                start_date=self.start_date, 
+                                adj="hfq")
         if price is None or price.empty:
             raise ValueError("failed to get tushare pro_bar ts_code: {}, date: {}"\
                         .format(self.ts_code, self.start_date))
@@ -65,6 +62,26 @@ class Recall:
         days = d - orig
         return days.days
 
+def basic(ts, symbol) -> str:
+    info = ts.basic()
+
+    result=[]
+    for col in [uts.TS_CODE, uts.SYMBOL, uts.NAME]:
+        r = info[info[col].str.contains(symbol) == True]
+
+        if r.empty: 
+            continue
+
+        result.append(r)
+        break
+
+    if len(result) == 0:
+        raise ValueError("%s not exists".format(symbol))
+    elif len(result) > 1:
+        raise ValueError("%s has too many match".format(symbol))
+
+    return result[0][uts.TS_CODE].values[0]
+
 def main():
     opt = argparse.ArgumentParser(description="Mara Recall main program")
 
@@ -79,17 +96,12 @@ def main():
     arg = opt.parse_args()
 
     # token
-    token = load_token()
+    ts = uts.TsWrapper()
 
-    api = ts.pro_api(token=token)
-    
     # symbol
-    ts_code = lookup_ts_code(api, arg.SYMBOL[0])
-    if len(ts_code) == 0:
-        warnings.warn('cannot parse symbol {}'.format(arg.SYMBOL))
-        exit(1)
+    ts_code = basic(ts, arg.SYMBOL[0])
 
-    res = Recall(api, ts_code[0], arg.start_date, days=arg.days).Run()
+    res = Recall(ts, ts_code, arg.start_date, days=arg.days).Run()
     print("{},{},{},{}".format(res["min_days"], res["min_pct"], 
                             res["max_days"], res["max_pct"]))
 

@@ -12,6 +12,7 @@ NAME='name'
 AREA='area'
 INDUSTRY='industry'
 MARKET='market'
+END_DATE='end_date'
 
 COLUMNS = [TS_CODE, SYMBOL, NAME, AREA, INDUSTRY, MARKET]
 
@@ -36,8 +37,27 @@ class TsWrapper:
     def basic(self, **args):
         return self.pro.query('stock_basic', **args)
 
+    def pro_bar(self, ts_code, start_date, adj) -> pd.DataFrame:
+        # Exception: 抱歉，您每分钟最多访问该接口50次，
+        # 权限的具体详情访问：https://tushare.pro/document/1?doc_id=108
+        for _ in range(3):
+            try:
+                # df :
+                # ts_code, <date_col>(descending), fields
+                df = ts.pro_bar(ts_code=ts_code, 
+                                api=self.pro,
+                                start_date=start_date, 
+                                adj=adj)
+            except Exception:
+                time.sleep(60)
+                continue
+
+            break
+
+        return df
+
     def query_many(self, api, ts_code, start_date, end_date, 
-            fields, date_col='end_date', latest=False) -> pd.DataFrame:
+            fields, date_col=END_DATE, latest=False) -> pd.DataFrame:
         '''
         query_many is a simple wrapper around an tushare api. 
         and will pivot to:
