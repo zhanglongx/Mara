@@ -20,11 +20,11 @@ class OCFPS(mara.ModuleProtocol):
         result = list()
 
         for s in self.ts_code:
-            close = self.ts.query('daily_basic', ts_code=s,
+            close = self.ts.query_many('daily_basic', ts_code=s,
                                 start_date=self.start_date, end_date=self.end_date,
                                 fields=['close'], date_col='trade_date', latest=True)
 
-            ocfps = self.ts.query('fina_indicator', ts_code=s,
+            ocfps = self.ts.query_many('fina_indicator', ts_code=s,
                                 start_date=self.start_date, end_date=self.end_date,
                                 fields=['ocfps'], date_col='end_date', latest=False)
             

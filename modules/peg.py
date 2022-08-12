@@ -21,11 +21,11 @@ class PEG(mara.ModuleProtocol):
 
         pe_field = 'pe_ttm' if ttm else 'pe'
         for s in self.ts_code:
-            pe = self.ts.query('daily_basic', ts_code=s,
+            pe = self.ts.query_many('daily_basic', ts_code=s,
                             start_date=self.start_date, end_date=self.end_date,
                             fields=[pe_field], date_col='trade_date', latest=True)
 
-            g = self.ts.query('fina_indicator', ts_code=s,
+            g = self.ts.query_many('fina_indicator', ts_code=s,
                            start_date=self.start_date, end_date=self.end_date,
                            fields=['q_profit_yoy'])
 

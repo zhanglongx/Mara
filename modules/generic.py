@@ -228,7 +228,7 @@ class GenericMod(mara.ModuleProtocol):
 
         result = list()
         for s in self.ts_code:
-            df = self.ts.query(api_name, ts_code=s,
+            df = self.ts.query_many(api_name, ts_code=s,
                             start_date=self.start_date,
                             end_date=self.end_date,
                             fields=[name],

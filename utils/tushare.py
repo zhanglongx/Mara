@@ -36,10 +36,10 @@ class TsWrapper:
     def basic(self, **args):
         return self.pro.query('stock_basic', **args)
 
-    def query(self, api, ts_code, start_date, end_date, 
+    def query_many(self, api, ts_code, start_date, end_date, 
             fields, date_col='end_date', latest=False) -> pd.DataFrame:
         '''
-        one is a simple wrapper around an tushare api. 
+        query_many is a simple wrapper around an tushare api. 
         and will pivot to:
 
                        |    <indicator1>    | <indicator2>
