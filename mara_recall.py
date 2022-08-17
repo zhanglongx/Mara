@@ -65,22 +65,21 @@ class Recall:
 def basic(ts, symbol) -> str:
     info = ts.basic()
 
-    result=[]
     for col in [uts.TS_CODE, uts.SYMBOL, uts.NAME]:
         r = info[info[col].str.contains(symbol) == True]
 
         if r.empty: 
             continue
 
-        result.append(r)
+        result = r
         break
 
-    if len(result) == 0:
-        raise ValueError("%s not exists".format(symbol))
-    elif len(result) > 1:
-        raise ValueError("%s has too many match".format(symbol))
+    if result.shape[0] == 0:
+        raise ValueError("{} not exists".format(symbol))
+    elif result.shape[0] > 1:
+        raise ValueError("{} has too many matches".format(symbol))
 
-    return result[0][uts.TS_CODE].values[0]
+    return result[uts.TS_CODE].values[0]
 
 def main():
     opt = argparse.ArgumentParser(description="Mara Recall main program")
@@ -102,7 +101,7 @@ def main():
     ts_code = basic(ts, arg.SYMBOL[0])
 
     res = Recall(ts, ts_code, arg.start_date, days=arg.days).Run()
-    print("{},{},{},{}".format(res["min_days"], res["min_pct"], 
+    print("{},{},{},{},{}".format(ts_code,res["min_days"], res["min_pct"], 
                             res["max_days"], res["max_pct"]))
 
 if __name__ == '__main__':
