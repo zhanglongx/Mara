@@ -88,7 +88,7 @@ def main():
                     help="recall start date in (%%Y%%m%%d)")
     opt.add_argument("-d", "--days", type=int, 
                     default=DEFAULT_DAYS,
-                    help="recall days")
+                    help="recall days [{}]".format(DEFAULT_DAYS))
     opt.add_argument("SYMBOL", type=str, nargs=1,
                     help="symbol, can be one of ts_code, symbol, name")
 
