@@ -65,6 +65,7 @@ class Recall:
 def basic(ts, symbol) -> str:
     info = ts.basic()
 
+    result = None
     for col in [uts.TS_CODE, uts.SYMBOL, uts.NAME]:
         r = info[info[col].str.contains(symbol) == True]
 
@@ -74,8 +75,14 @@ def basic(ts, symbol) -> str:
         result = r
         break
 
-    if result.shape[0] == 0:
-        raise ValueError("{} not exists".format(symbol))
+    if result is None:
+        # old name
+        old = ts.old_name()
+        result = old[old[uts.NAME].str.contains(symbol) == True]
+        if result.empty:
+            raise ValueError("{} not exists".format(symbol))
+
+        # NOTE: old may contain more than 1, simply skip
     elif result.shape[0] > 1:
         raise ValueError("{} has too many matches".format(symbol))
 

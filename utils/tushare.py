@@ -34,8 +34,11 @@ class TsWrapper:
 
         self.pro = ts.pro_api(token=token)
     
-    def basic(self, **args):
+    def basic(self, **args) -> pd.DataFrame:
         return self.pro.query('stock_basic', **args)
+
+    def old_name(self, **args) -> pd.DataFrame:
+        return self.pro.namechange()
 
     def pro_bar(self, ts_code, start_date, adj) -> pd.DataFrame:
         # Exception: 抱歉，您每分钟最多访问该接口50次，
