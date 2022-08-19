@@ -2,6 +2,7 @@ import datetime
 import argparse
 
 import utils.tushare as uts
+import version
 
 DEFAULT_DAYS=60
 
@@ -96,6 +97,8 @@ def main():
     opt.add_argument("-d", "--days", type=int, 
                     default=DEFAULT_DAYS,
                     help="recall days [{}]".format(DEFAULT_DAYS))
+    opt.add_argument('-v', '--version', action='version',
+                    version='%(prog)s {}'.format(version.__version__))
     opt.add_argument("SYMBOL", type=str, nargs=1,
                     help="symbol, can be one of ts_code, symbol, name")
 

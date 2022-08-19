@@ -4,8 +4,6 @@ import pathlib
 import sys
 import warnings
 
-__version__ = '1.2.1'
-
 # XXX:
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -15,6 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import utils.tushare as uts
+import version
 
 class ModuleProtocol():
     '''
@@ -84,6 +83,7 @@ def basic(ts, column=uts.NAME, keywords=[]) -> pd.DataFrame:
     if len(keywords) == 0:
         return info
 
+    # FIXME: add old name
     result=[]
     for k in keywords:
         r = info[info[column].str.contains(k) == True]
@@ -176,7 +176,7 @@ def main():
     opt.add_argument('--no-latest', action='store_true', default=False,
                     help='print all, not only the latest date. Not all modules accept it')
     opt.add_argument('-v', '--version', action='version',
-                    version='%(prog)s {}'.format(__version__))
+                    version='%(prog)s {}'.format(version.__version__))
     opt.add_argument('-x', '--excel', action='store_true', default=False,
                     help='''
                     export to excel, instead of stdout. 
