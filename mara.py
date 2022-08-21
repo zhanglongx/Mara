@@ -76,25 +76,6 @@ class ModuleProtocol():
         for c in df.columns.levels[0]:
             df[c].transpose().plot(subplots=True, title=c)
 
-# TODO: may make basic a module
-def basic(ts, column=uts.NAME, keywords=[]) -> pd.DataFrame:
-    info = ts.basic()
-
-    if len(keywords) == 0:
-        return info
-
-    # FIXME: add old name
-    result=[]
-    for k in keywords:
-        r = info[info[column].str.contains(k) == True]
-
-        if r.empty: 
-            raise ValueError('no keyword matched: {}'.format(k))
-
-        result.append(r)
-
-    return pd.concat(result).drop_duplicates().reset_index(drop=True)
-
 def check_date(s) -> None:
     if not s is None:
         try:
@@ -205,7 +186,7 @@ def main():
     if not arg.column in uts.COLUMNS:
         raise ValueError('{} not in {}'.format(arg.column, ','.join(uts.COLUMNS)))
 
-    output = basic(ts, arg.column, keywords=arg.KEYWORD)
+    output = uts.basic_info(ts, arg.column, keywords=arg.KEYWORD)
 
     if arg.list == True:
         output = output[arg.column]

@@ -33,12 +33,21 @@ class TsWrapper:
             raise SyntaxError('token is missing in {}'.format(filename))
 
         self.pro = ts.pro_api(token=token)
+
+        self.table_basic    = None
+        self.table_old_name = None
     
     def basic(self, **args) -> pd.DataFrame:
-        return self.pro.query('stock_basic', **args)
+        if self.table_basic is None:
+            self.table_basic = self.pro.query('stock_basic') 
+
+        return self.table_basic 
 
     def old_name(self, **args) -> pd.DataFrame:
-        return self.pro.namechange()
+        if self.table_old_name is None:
+            self.table_old_name = self.pro.namechange() 
+
+        return self.table_old_name
 
     def pro_bar(self, ts_code, start_date, adj) -> pd.DataFrame:
         # Exception: 抱歉，您每分钟最多访问该接口50次，
@@ -105,3 +114,42 @@ class TsWrapper:
             return df.loc[idx[:, idx[:, df.columns.get_level_values(1)[-1]]]]
         else:
             return df
+
+def covert_name(ts, names: list) -> list:
+    '''
+    convert_name will first lookup basic. if not found, lookup
+    the old_name and return the current name
+    NOTE: here the partial matching is used
+    '''
+    if not isinstance(ts, TsWrapper):
+        raise TypeError("must have TsWrapper")
+
+    basic = ts.basic()
+    old_name = ts.old_name()
+
+    ts_code = []
+    for n in names: 
+        r = basic[basic[NAME].str.contains(n) == True]
+
+        if r.empty:
+            r = old_name[old_name[NAME].str.contains(n) == True]
+
+            if r.empty:
+                raise ValueError("{} not exists".format(n))
+
+            r = r.drop_duplicates(subset=TS_CODE)
+
+        ts_code.extend(r[TS_CODE].tolist())
+
+    return basic[basic[TS_CODE].isin(ts_code)][NAME].tolist()
+
+def basic_info(ts, column=NAME, keywords=[]) -> pd.DataFrame:
+    info = ts.basic()
+
+    if len(keywords) == 0:
+        return info
+
+    if column == NAME:
+        keywords = covert_name(ts, keywords)
+
+    return info[info[column].isin(keywords)].sort_values(TS_CODE)

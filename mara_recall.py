@@ -1,5 +1,6 @@
 import datetime
 import argparse
+from signal import raise_signal
 
 import utils.tushare as uts
 import version
@@ -63,32 +64,6 @@ class Recall:
         days = d - orig
         return days.days
 
-def basic(ts, symbol) -> str:
-    info = ts.basic()
-
-    result = None
-    for col in [uts.TS_CODE, uts.SYMBOL, uts.NAME]:
-        r = info[info[col].str.contains(symbol) == True]
-
-        if r.empty: 
-            continue
-
-        result = r
-        break
-
-    if result is None:
-        # old name
-        old = ts.old_name()
-        result = old[old[uts.NAME].str.contains(symbol) == True]
-        if result.empty:
-            raise ValueError("{} not exists".format(symbol))
-
-        # NOTE: old may contain more than 1, simply skip
-    elif result.shape[0] > 1:
-        raise ValueError("{} has too many matches".format(symbol))
-
-    return result[uts.TS_CODE].values[0]
-
 def main():
     opt = argparse.ArgumentParser(description="Mara Recall main program")
 
@@ -100,7 +75,7 @@ def main():
     opt.add_argument('-v', '--version', action='version',
                     version='%(prog)s {}'.format(version.__version__))
     opt.add_argument("SYMBOL", type=str, nargs=1,
-                    help="symbol, can be one of ts_code, symbol, name")
+                    help="symbol name")
 
     arg = opt.parse_args()
 
@@ -108,10 +83,14 @@ def main():
     ts = uts.TsWrapper()
 
     # symbol
-    ts_code = basic(ts, arg.SYMBOL[0])
+    basic_info = uts.basic_info(ts, column=uts.NAME, keywords=arg.SYMBOL)
+    ts_code = basic_info[uts.TS_CODE].tolist()
 
-    res = Recall(ts, ts_code, arg.start_date, days=arg.days).Run()
-    print("{},{},{},{},{}".format(ts_code,res["min_days"], res["min_pct"], 
+    if len(ts_code) != 1:
+        raise ValueError("too many matches for %s".format(arg.SYMBOL[0]))
+
+    res = Recall(ts, ts_code[0], arg.start_date, days=arg.days).Run()
+    print("{},{},{},{},{}".format(ts_code[0],res["min_days"], res["min_pct"], 
                             res["max_days"], res["max_pct"]))
 
 if __name__ == '__main__':
