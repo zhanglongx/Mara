@@ -49,7 +49,7 @@ class TsWrapper:
 
         return self.table_old_name
 
-    def pro_bar(self, ts_code, start_date, adj) -> pd.DataFrame:
+    def pro_bar(self, ts_code, start_date, end_date, adj) -> pd.DataFrame:
         # Exception: 抱歉，您每分钟最多访问该接口50次，
         # 权限的具体详情访问：https://tushare.pro/document/1?doc_id=108
         for _ in range(3):
@@ -59,6 +59,7 @@ class TsWrapper:
                 df = ts.pro_bar(ts_code=ts_code, 
                                 api=self.pro,
                                 start_date=start_date, 
+                                end_date=end_date,
                                 adj=adj)
             except Exception:
                 time.sleep(60)
