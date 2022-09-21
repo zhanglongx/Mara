@@ -207,7 +207,7 @@ def main():
             start_date=arg.start_date, \
             end_date=arg.end_date)
 
-        if arg.plot:
+        if arg.plot and not arg.no_latest:
             warnings.warn('\'-p\' specified, using \'--no-latest\'')
             arg.no_latest = True
 
