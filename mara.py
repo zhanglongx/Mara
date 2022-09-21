@@ -61,6 +61,7 @@ class ModuleProtocol():
                    -----------------------------------------------
         <ts_code>  |
 
+        latest: {boolen} series or latest only
         ttm: {boolen} whether use ttm
         '''
 
