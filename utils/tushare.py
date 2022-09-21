@@ -123,7 +123,7 @@ def covert_name(ts, names: list) -> list:
     NOTE: here the partial matching is used
     '''
     if not isinstance(ts, TsWrapper):
-        raise TypeError("must have TsWrapper")
+        raise TypeError('must have TsWrapper')
 
     basic = ts.basic()
     old_name = ts.old_name()
@@ -136,7 +136,7 @@ def covert_name(ts, names: list) -> list:
             r = old_name[old_name[NAME].str.contains(n) == True]
 
             if r.empty:
-                raise ValueError("{} not exists".format(n))
+                raise ValueError('{} not exists'.format(n))
 
             r = r.drop_duplicates(subset=TS_CODE)
 

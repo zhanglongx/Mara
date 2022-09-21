@@ -24,13 +24,13 @@ class Recall(mara.ModuleProtocol):
             price = self.ts.pro_bar(ts_code=s, 
                                     start_date=self.start_date, 
                                     end_date=self.end_date,
-                                    adj="hfq")
+                                    adj='hfq')
             if price is None or price.empty:
-                raise ValueError("failed to get tushare pro_bar ts_code: {}, date: {}"\
+                raise ValueError('failed to get tushare pro_bar ts_code: {}, date: {}'\
                             .format(self.ts_code, self.start_date))
 
-            price = price.set_index("trade_date")
-            price = price["close"]
+            price = price.set_index('trade_date')
+            price = price['close']
 
             # reverse and select only we need
             price = price.iloc[::-1]
@@ -38,16 +38,16 @@ class Recall(mara.ModuleProtocol):
             result = dict()
             result[uts.TS_CODE] = s
 
-            result["min_pct"] = price.min() / price.iloc[0]
+            result['min_pct'] = price.min() / price.iloc[0]
             min_date = price.idxmin()
 
-            result["max_pct"] = price.loc[min_date:].max() / price.iloc[0]
+            result['max_pct'] = price.loc[min_date:].max() / price.iloc[0]
             max_date = price.loc[min_date:].idxmax()
 
-            result["min_days"] = self._timeDelta(min_date)
-            result["max_days"] = self._timeDelta(max_date)
+            result['min_days'] = self._timeDelta(min_date)
+            result['max_days'] = self._timeDelta(max_date)
 
-            result["now_pct"] = price.iloc[-1] / price[0]
+            result['now_pct'] = price.iloc[-1] / price[0]
 
             array.append(pd.DataFrame(result, index=[0]))
 
@@ -55,11 +55,11 @@ class Recall(mara.ModuleProtocol):
 
     def _timeDelta(self, date) -> int:
         try: 
-            orig = datetime.datetime.strptime(self.start_date, "%Y%m%d")
+            orig = datetime.datetime.strptime(self.start_date, '%Y%m%d')
         except ValueError:
-            raise ValueError("Cannot parse orig: {}".format(self.start_date))
+            raise ValueError('Cannot parse orig: {}'.format(self.start_date))
         
-        d = datetime.datetime.strptime(date, "%Y%m%d")
+        d = datetime.datetime.strptime(date, '%Y%m%d')
 
         days = d - orig
         return days.days
