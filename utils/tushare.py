@@ -147,6 +147,9 @@ def covert_name(ts, names: list) -> list:
 def basic_info(ts, column=NAME, keywords=[]) -> pd.DataFrame:
     info = ts.basic()
 
+    if info.empty:
+        raise ValueError('get info failed')
+
     if len(keywords) == 0:
         return info
 
