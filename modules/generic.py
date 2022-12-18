@@ -1,4 +1,3 @@
-from signal import raise_signal
 import pandas as pd
 
 import mara
