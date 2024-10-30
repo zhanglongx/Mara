@@ -218,6 +218,9 @@ def main():
 
         arg.sort = len(output.columns) + arg.sort
 
+        # Ensure both DataFrames have the same level of column indices
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
         output = pd.merge(output, df, on=uts.TS_CODE)
 
         if arg.plot:
