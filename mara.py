@@ -74,7 +74,7 @@ class ModuleProtocol():
         if not implemented, the super provides a basic implement.
         '''
 
-        for c in df.columns.levels[0]:
+        for c in df.columns.get_level_values(0):
             df[c].transpose().plot(subplots=True, title=c)
 
 def check_date(s) -> None:
@@ -220,7 +220,7 @@ def main():
 
         # Ensure both DataFrames have the same level of column indices
         if isinstance(df.columns, pd.MultiIndex):
-            df.columns = df.columns.get_level_values(0)
+            output.columns = pd.MultiIndex.from_product([output.columns, ['']])
         output = pd.merge(output, df, on=uts.TS_CODE)
 
         if arg.plot:
