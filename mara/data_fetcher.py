@@ -146,8 +146,8 @@ class DataFetcher:
         if date_range is not None:
             start_date: date = date_range.start
             end_date: date = date_range.end
-            mask_range: pd.Series = (data["_end_date"].dt.date >= start_date) & (
-                data["_end_date"].dt.date <= end_date
+            mask_range: pd.Series = (data["_end_date"].dt.date >= start_date) & ( # type: ignore
+                data["_end_date"].dt.date <= end_date # type: ignore
             )
             data = data[mask_range]
 
@@ -162,7 +162,7 @@ class DataFetcher:
         data["_end_date"] = pd.to_datetime(data["end_date"], format="%Y%m%d", errors="coerce")
         data = data[data["_end_date"].notna()]
         quarter_mask: list[bool] = filter_quarter_dates(
-            data["_end_date"].dt.date.tolist(), season
+            data["_end_date"].dt.date.tolist(), season # type: ignore
         )
         data = data[pd.Series(quarter_mask, index=data.index)]
         data = data.drop(columns=["_end_date"])
@@ -172,7 +172,7 @@ class DataFetcher:
         data = data.copy()
         data["_end_date"] = pd.to_datetime(data["end_date"], format="%Y%m%d", errors="coerce")
         data = data[data["_end_date"].notna()]
-        data["_year"] = data["_end_date"].dt.year
+        data["_year"] = data["_end_date"].dt.year # type: ignore
         data = data.sort_values(["ts_code", "_year", "_end_date"])
 
         for indicator in indicators:
