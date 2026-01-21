@@ -9,10 +9,10 @@ from typing import Iterable
 
 from mara.config import AppConfig, load_config
 from mara.constants import API_ORDER
-from mara.data_fetcher import IndicatorResult, fetch_indicators
-from mara.data_processor import OutputTable, build_output_tables
+from mara.data_fetcher import DataFetcher, IndicatorResult
+from mara.data_processor import DataProcessor, OutputTable
 from mara.date_utils import DateRange, to_date_range
-from mara.excel_exporter import export_excel
+from mara.excel_exporter import ExcelExporter
 from mara.indicator_registry import IndicatorRegistry, load_registry
 from mara.plugin_loader import load_plugins
 from mara.query_options import QueryOptions
@@ -34,9 +34,7 @@ def run_app(options: QueryOptions, keywords: Iterable[str]) -> AppResult:
     config: AppConfig = load_config(options.config_path)
     client: TushareClient = TushareClient(token=config.token)
 
-    base_dir: Path = Path(__file__).resolve().parents[1]
-    doc_dir: Path = base_dir / "doc"
-    registry: IndicatorRegistry = load_registry(doc_dir, API_ORDER)
+    registry: IndicatorRegistry = load_registry(API_ORDER)
     plugin_dir: Path = Path.cwd() / "plugins"
     load_plugins(plugin_dir, registry)
 
@@ -50,9 +48,8 @@ def run_app(options: QueryOptions, keywords: Iterable[str]) -> AppResult:
             options.start_date, options.end_date, default_start=_default_start()
         )
 
-    results: list[IndicatorResult] = fetch_indicators(
-        client=client,
-        registry=registry,
+    data_fetcher: DataFetcher = DataFetcher(client=client, registry=registry)
+    results: list[IndicatorResult] = data_fetcher.fetch_indicators(
         indicators=options.indicators,
         ts_codes=selection.ts_codes,
         date_range=date_range,
@@ -63,8 +60,9 @@ def run_app(options: QueryOptions, keywords: Iterable[str]) -> AppResult:
     )
 
     include_end_date: bool = not options.latest and options.aggregate is None
-    tables: list[OutputTable] = build_output_tables(
-        selection.basic_info, results, include_end_date
+    data_processor: DataProcessor = DataProcessor(selection.basic_info)
+    tables: list[OutputTable] = data_processor.build_output_tables(
+        results, include_end_date
     )
 
     if options.sort_by:
@@ -73,7 +71,8 @@ def run_app(options: QueryOptions, keywords: Iterable[str]) -> AppResult:
     print_tables(tables, options.delimiter, include_header=not options.no_header)
 
     if options.excel_path:
-        export_excel(options.excel_path, selection.basic_info, results)
+        excel_exporter: ExcelExporter = ExcelExporter(selection.basic_info)
+        excel_exporter.export(options.excel_path, results)
 
     if options.plot:
         plot_indicators(results)
