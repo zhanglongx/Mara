@@ -91,7 +91,6 @@ def _validate_options(options: QueryOptions) -> None:
         raise ValueError("--aggregate requires a valid --season")
 
 
-# TODO: take effort
 def _sort_tables(tables: list[OutputTable], sort_by: str, order: str) -> None:
     descending: bool = order == "desc"
     for table in tables:

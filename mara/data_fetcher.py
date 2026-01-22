@@ -203,6 +203,7 @@ class DataFetcher:
         end_dates: pd.Series = pd.to_datetime(
             data["end_date"], format="%Y%m%d", errors="coerce"
         )
+        # FIXME: no silent failures
         data["_end_date"] = end_dates
         data = data[data["_end_date"].notna()]
 
