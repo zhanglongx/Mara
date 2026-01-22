@@ -41,7 +41,7 @@ def setup_logging(level: int) -> logging.Logger:
         handler.setFormatter(formatter)
         logger.addHandler(handler)
     else:
-        for handler in logger.handlers:
+        for handler in logger.handlers: # type: ignore
             handler.setLevel(level)
     return logger
 
