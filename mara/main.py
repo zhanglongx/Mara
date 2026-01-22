@@ -37,7 +37,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--delimiter", default=",", help="Output delimiter")
     parser.add_argument("-p", "--plot", action="store_true", help="Plot indicators")
     parser.add_argument("-c", "--config", dest="config_path", default="~/.mararc")
-    parser.add_argument("--version", action="version", version="mara 0.1.0")
+    parser.add_argument("--version", action="version", version="mara 0.1.1")
     parser.add_argument("--debug", action="store_true")
     return parser
 
