@@ -29,12 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-a", "--aggregate", choices=["mean", "median"], help="Aggregate quarterly data")
     parser.add_argument("-t", "--sort-by", dest="sort_by", help="Sort by indicator")
     parser.add_argument("--sort-order", choices=["asc", "desc"], default="asc")
-    parser.add_argument(
-        "-v",
-        "--verbose",
-        default=DEFAULT_LOG_LEVEL_NAME,
-        type=parse_log_level,
-        metavar="LEVEL",
+    parser.add_argument("-v", "--verbose", default=DEFAULT_LOG_LEVEL_NAME, type=parse_log_level, metavar="LEVEL",
         help=f"Log level ({', '.join(LOG_LEVEL_CHOICES)}); default: {DEFAULT_LOG_LEVEL_NAME}",
     )
     parser.add_argument("-x", "--excel", dest="excel_path", help="Excel output path")
