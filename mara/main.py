@@ -19,7 +19,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--season", type=int, choices=[1, 2, 3, 4], default=4)
     parser.add_argument("--single", action="store_true", help="Use single-quarter (non-cumulative) values")
     parser.add_argument("--latest", action="store_true", help="Fetch latest data")
-    parser.add_argument("--aggregate", choices=["mean", "median"], help="Aggregate quarterly data")
+    parser.add_argument("-a", "--aggregate", choices=["mean", "median"], help="Aggregate quarterly data")
     parser.add_argument("-t", "--sort-by", dest="sort_by", help="Sort by indicator")
     parser.add_argument("--sort-order", choices=["asc", "desc"], default="asc")
     parser.add_argument("-x", "--excel", dest="excel_path", help="Excel output path")

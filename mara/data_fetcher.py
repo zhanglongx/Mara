@@ -142,6 +142,8 @@ class DataFetcher:
         )
         data["_end_date"] = end_dates
         data = data[data["_end_date"].notna()]
+        # TODO: investigate why duplicates appear
+        data = data.drop_duplicates()
 
         if date_range is not None:
             start_date: date = date_range.start
