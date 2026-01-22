@@ -68,6 +68,8 @@ mara [OPTIONS] [KEYWORD ...]
 
 - `--sort-order TEXT`：可选参数，指定排序的顺序，可以是"asc"（升序）或"desc"（降序）。默认为"asc"。
 
+- `-v, --verbose TEXT`：可选参数，指定日志输出级别（error、warn、info、debug），默认warn。日志输出到stderr。
+
 - `-x, --excel TEXT`：可选参数，指定输出的Excel文件路径。
 
 - `--no-header`：可选参数，指定不输出标题行。
@@ -82,4 +84,4 @@ mara [OPTIONS] [KEYWORD ...]
 
 - `--version`：显示版本信息并退出。
 
-- `--debug`：启用调试模式，输出更多的调试信息。
+- `--debug`：启用调试模式，输出更多的调试信息（等同于verbose=debug）。
