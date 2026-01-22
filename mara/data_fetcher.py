@@ -191,14 +191,21 @@ class DataFetcher:
             )
             data = data[mask_range]
 
-        # XXX: Dedupe by Tushare official fields: pick one record per ts_code+end_date
-        # using report_type priority, update_flag (corrected first), then latest ann date.
         data = self._dedupe_by_official_fields(data)
         data = data.sort_values(["ts_code", "_end_date"]).drop(columns=["_end_date"])
         data["end_date"] = data["end_date"].astype(str)
         return data
 
     def _dedupe_by_official_fields(self, data: pd.DataFrame) -> pd.DataFrame:
+        '''
+        Deduplicate DataFrame records based on official fields (ts_code and end_date).
+        This method removes duplicate records for the same security (ts_code) and reporting period (end_date),
+        keeping only the most recent or highest-priority record based on multiple ranking criteria.
+        The deduplication logic prioritizes records in the following order:
+        1. Report type priority (defined by REPORT_TYPE_PRIORITY mapping)
+        2. Update flag (preferring updated records marked as '1')
+        3. Announcement date (preferring f_ann_date, then ann_date, then end_date)
+        '''
         if "ts_code" not in data.columns or "end_date" not in data.columns:
             return data
         data = data.copy()
