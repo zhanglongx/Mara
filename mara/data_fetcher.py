@@ -145,7 +145,15 @@ class DataFetcher:
                 params["start_date"] = to_yyyymmdd(date_range.start)
                 params["end_date"] = to_yyyymmdd(date_range.end)
             api_df: pd.DataFrame = self._client.query(api_name, **params)
+            api_df = api_df.dropna(how="all")
             if api_df.empty:
+                continue
+            all_na_mask: pd.Series = api_df.isna().all()
+            all_na_cols: list[str] = all_na_mask[all_na_mask].index.tolist()
+            if all_na_cols:
+                api_df = api_df.drop(columns=all_na_cols)
+            required_cols: set[str] = {"ts_code", "end_date"}
+            if not required_cols.issubset(api_df.columns):
                 continue
             frames.append(api_df)
 
@@ -154,6 +162,7 @@ class DataFetcher:
 
         combined_df: pd.DataFrame = pd.concat(frames, ignore_index=True)
         combined_df = self._normalize_and_filter_range(combined_df, date_range)
+        combined_df = self._ensure_indicator_columns(combined_df, indicators)
 
         if single and api_name in SINGLE_QUARTER_APIS:
             combined_df = self._to_single_quarter(combined_df, indicators)
@@ -166,6 +175,19 @@ class DataFetcher:
             combined_df = self._aggregate_quarter(combined_df, indicators, aggregate)
 
         return combined_df
+
+    def _ensure_indicator_columns(
+        self, data: pd.DataFrame, indicators: list[str]
+    ) -> pd.DataFrame:
+        missing: list[str] = [
+            indicator for indicator in indicators if indicator not in data.columns
+        ]
+        if not missing:
+            return data
+        data = data.copy()
+        for indicator in missing:
+            data[indicator] = float("nan")
+        return data
 
     def _dedupe_fields_for_api(self, api_name: str) -> list[str]:
         api_spec: ApiSpec | None = self._registry.api_specs.get(api_name)
