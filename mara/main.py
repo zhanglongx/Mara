@@ -3,8 +3,15 @@
 from __future__ import annotations
 
 import argparse
+import logging
 
 from mara.app import run_app
+from mara.logger import (
+    DEFAULT_LOG_LEVEL_NAME,
+    LOG_LEVEL_CHOICES,
+    parse_log_level,
+    setup_logging,
+)
 from mara.query_options import QueryOptions
 
 
@@ -22,6 +29,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-a", "--aggregate", choices=["mean", "median"], help="Aggregate quarterly data")
     parser.add_argument("-t", "--sort-by", dest="sort_by", help="Sort by indicator")
     parser.add_argument("--sort-order", choices=["asc", "desc"], default="asc")
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        default=DEFAULT_LOG_LEVEL_NAME,
+        type=parse_log_level,
+        metavar="LEVEL",
+        help=f"Log level ({', '.join(LOG_LEVEL_CHOICES)}); default: {DEFAULT_LOG_LEVEL_NAME}",
+    )
     parser.add_argument("-x", "--excel", dest="excel_path", help="Excel output path")
     parser.add_argument("--no-header", action="store_true", help="Disable header row")
     parser.add_argument("--delimiter", default=",", help="Output delimiter")
@@ -37,6 +52,9 @@ def _build_options(parsed: argparse.Namespace) -> QueryOptions:
     indicators: list[str] = [item.strip() for item in indicators_value.split(",") if item.strip()]
     if not indicators:
         raise ValueError("--indicators cannot be empty")
+    log_level: int = parsed.verbose
+    if parsed.debug:
+        log_level = logging.DEBUG
     options: QueryOptions = QueryOptions(
         indicators=indicators,
         start_date=parsed.start_date,
@@ -52,6 +70,7 @@ def _build_options(parsed: argparse.Namespace) -> QueryOptions:
         plot=parsed.plot,
         excel_path=parsed.excel_path,
         config_path=parsed.config_path,
+        log_level=log_level,
         debug=parsed.debug,
     )
     return options
@@ -61,6 +80,7 @@ def main(argv: list[str] | None = None) -> int:
     parser: argparse.ArgumentParser = build_parser()
     parsed: argparse.Namespace = parser.parse_args(argv)
     options: QueryOptions = _build_options(parsed)
+    setup_logging(options.log_level)
     keywords: list[str] = list(parsed.keywords)
     _ = run_app(options, keywords)
     return 0

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import date
 from typing import Any, Callable, Iterable
@@ -11,6 +12,7 @@ import pandas as pd
 from mara.constants import META_FIELDS, SINGLE_QUARTER_APIS
 from mara.date_utils import DateRange, filter_quarter_dates, to_yyyymmdd
 from mara.indicator_registry import ApiSpec, IndicatorRegistry
+from mara.logger import get_logger
 from mara.tushare_client import TushareClient
 
 REPORT_TYPE_PRIORITY: dict[str, int] = {
@@ -29,6 +31,8 @@ REPORT_TYPE_PRIORITY: dict[str, int] = {
 }
 
 DEDUP_FIELD_CANDIDATES: list[str] = ["report_type", "update_flag", "f_ann_date"]
+
+LOGGER: logging.Logger = get_logger(__name__)
 
 
 @dataclass(frozen=True)
@@ -56,6 +60,7 @@ class DataFetcher:
         indicator_list: list[str] = list(indicators)
         ts_code_list: list[str] = list(ts_codes)
         grouped: dict[str, list[str]] = {}
+        unsupported_single_apis: set[str] = set()
         results: list[IndicatorResult] = []
 
         for indicator in indicator_list:
@@ -69,6 +74,17 @@ class DataFetcher:
                 )
                 continue
             grouped.setdefault(api_name, []).append(indicator)
+            if single and api_name not in SINGLE_QUARTER_APIS:
+                unsupported_single_apis.add(api_name)
+
+        if single and unsupported_single_apis:
+            supported: str = ", ".join(sorted(SINGLE_QUARTER_APIS))
+            ignored: str = ", ".join(sorted(unsupported_single_apis))
+            LOGGER.warning(
+                "--single only applies to APIs [%s]; ignored for indicators from APIs [%s]",
+                supported,
+                ignored,
+            )
 
         for api_name, api_indicators in grouped.items():
             api_df: pd.DataFrame = self._fetch_api_data(

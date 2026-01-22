@@ -21,4 +21,5 @@ class QueryOptions:
     plot: bool
     excel_path: str | None
     config_path: str
+    log_level: int
     debug: bool
