@@ -10,8 +10,25 @@ import pandas as pd
 
 from mara.constants import META_FIELDS, SINGLE_QUARTER_APIS
 from mara.date_utils import DateRange, filter_quarter_dates, to_yyyymmdd
-from mara.indicator_registry import IndicatorRegistry
+from mara.indicator_registry import ApiSpec, IndicatorRegistry
 from mara.tushare_client import TushareClient
+
+REPORT_TYPE_PRIORITY: dict[str, int] = {
+    "4": 60,
+    "1": 50,
+    "5": 40,
+    "11": 40,
+    "3": 30,
+    "2": 20,
+    "9": 15,
+    "10": 14,
+    "12": 13,
+    "8": 12,
+    "7": 11,
+    "6": 10,
+}
+
+DEDUP_FIELD_CANDIDATES: list[str] = ["report_type", "update_flag", "f_ann_date"]
 
 
 @dataclass(frozen=True)
@@ -102,7 +119,8 @@ class DataFetcher:
         aggregate: str | None,
     ) -> pd.DataFrame:
         frames: list[pd.DataFrame] = []
-        fields: list[str] = META_FIELDS + indicators
+        dedupe_fields: list[str] = self._dedupe_fields_for_api(api_name)
+        fields: list[str] = list(dict.fromkeys(META_FIELDS + dedupe_fields + indicators))
         fields_value: str = ",".join(fields)
 
         for ts_code in ts_codes:
@@ -133,6 +151,12 @@ class DataFetcher:
 
         return combined_df
 
+    def _dedupe_fields_for_api(self, api_name: str) -> list[str]:
+        api_spec: ApiSpec | None = self._registry.api_specs.get(api_name)
+        if api_spec is None:
+            return []
+        return [field for field in DEDUP_FIELD_CANDIDATES if field in api_spec.fields]
+
     def _normalize_and_filter_range(
         self, data: pd.DataFrame, date_range: DateRange | None
     ) -> pd.DataFrame:
@@ -142,8 +166,6 @@ class DataFetcher:
         )
         data["_end_date"] = end_dates
         data = data[data["_end_date"].notna()]
-        # TODO: investigate why duplicates appear
-        data = data.drop_duplicates()
 
         if date_range is not None:
             start_date: date = date_range.start
@@ -153,8 +175,75 @@ class DataFetcher:
             )
             data = data[mask_range]
 
+        # XXX: Dedupe by Tushare official fields: pick one record per ts_code+end_date
+        # using report_type priority, update_flag (corrected first), then latest ann date.
+        data = self._dedupe_by_official_fields(data)
         data = data.sort_values(["ts_code", "_end_date"]).drop(columns=["_end_date"])
         data["end_date"] = data["end_date"].astype(str)
+        return data
+
+    def _dedupe_by_official_fields(self, data: pd.DataFrame) -> pd.DataFrame:
+        if "ts_code" not in data.columns or "end_date" not in data.columns:
+            return data
+        data = data.copy()
+        if "_end_date" not in data.columns:
+            data["_end_date"] = pd.to_datetime(
+                data["end_date"], format="%Y%m%d", errors="coerce"
+            )
+        data = data[data["_end_date"].notna()]
+
+        if "report_type" in data.columns:
+            report_rank: pd.Series = (
+                data["report_type"]
+                .astype(str)
+                .map(REPORT_TYPE_PRIORITY)
+                .fillna(0)
+                .astype(int)
+            )
+            data["_report_rank"] = report_rank
+        else:
+            data["_report_rank"] = 0
+
+        if "update_flag" in data.columns:
+            data["_update_rank"] = data["update_flag"].astype(str).eq("1").astype(int)
+        else:
+            data["_update_rank"] = 0
+
+        f_ann_date: pd.Series | None = None
+        if "f_ann_date" in data.columns:
+            data["_f_ann_date"] = pd.to_datetime(
+                data["f_ann_date"], format="%Y%m%d", errors="coerce"
+            )
+            f_ann_date = data["_f_ann_date"]
+        ann_date: pd.Series | None = None
+        if "ann_date" in data.columns:
+            data["_ann_date"] = pd.to_datetime(
+                data["ann_date"], format="%Y%m%d", errors="coerce"
+            )
+            ann_date = data["_ann_date"]
+
+        if f_ann_date is not None:
+            date_rank: pd.Series = f_ann_date
+            if ann_date is not None:
+                date_rank = date_rank.fillna(ann_date)
+        elif ann_date is not None:
+            date_rank = ann_date
+        else:
+            date_rank = data["_end_date"]
+
+        data["_date_rank"] = date_rank.fillna(data["_end_date"])
+        data = data.sort_values(
+            ["ts_code", "_end_date", "_report_rank", "_update_rank", "_date_rank"]
+        )
+        data = data.groupby(["ts_code", "_end_date"], as_index=False, sort=False).tail(1)
+        drop_cols: list[str] = [
+            "_report_rank",
+            "_update_rank",
+            "_date_rank",
+            "_ann_date",
+            "_f_ann_date",
+        ]
+        data = data.drop(columns=[col for col in drop_cols if col in data.columns])
         return data
 
     def _filter_by_season(self, data: pd.DataFrame, season: int) -> pd.DataFrame:
