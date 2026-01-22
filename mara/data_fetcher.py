@@ -162,6 +162,7 @@ class DataFetcher:
 
         combined_df: pd.DataFrame = pd.concat(frames, ignore_index=True)
         combined_df = self._normalize_and_filter_range(combined_df, date_range)
+        # XXX: pd complains: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated
         combined_df = self._ensure_indicator_columns(combined_df, indicators)
 
         if single and api_name in SINGLE_QUARTER_APIS:
