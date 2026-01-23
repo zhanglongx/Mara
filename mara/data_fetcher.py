@@ -348,8 +348,10 @@ class DataFetcher:
         grouped: Any = data.groupby("ts_code", as_index=False)[indicators]
         if agg == "mean":
             agg_df: pd.DataFrame = grouped.mean(numeric_only=True)
-        else:
+        elif agg == "median":
             agg_df: pd.DataFrame = grouped.median(numeric_only=True)
+        else:
+            raise ValueError(f"Unsupported aggregate method: {agg}")
         agg_df["ann_date"] = None
         agg_df["end_date"] = None
         columns: list[str] = META_FIELDS + indicators
