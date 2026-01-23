@@ -13,6 +13,7 @@ from mara.logger import (
     setup_logging,
 )
 from mara.query_options import QueryOptions
+from mara.__version__ import __version__
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -37,7 +38,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--delimiter", default=",", help="Output delimiter")
     parser.add_argument("-p", "--plot", action="store_true", help="Plot indicators")
     parser.add_argument("-c", "--config", dest="config_path", default="~/.mararc")
-    parser.add_argument("--version", action="version", version="mara 0.1.1")
+    parser.add_argument("--version", action="version", version=f"mara {__version__}")
     parser.add_argument("--debug", action="store_true")
     return parser
 
