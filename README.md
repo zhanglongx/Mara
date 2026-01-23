@@ -17,8 +17,7 @@ Mara is an analysis and plotting tool that takes data from tushare and plots it 
 Example:
 
 ```bash
-	# print all basic info
-	$ python3 mara.py
+	$ python3 mara.py -i roe,debt_to_assets -s 2020-01-01 -e 2023-01-01 000001.SZ 600000.SH
 ```
 
 ## About
