@@ -301,6 +301,8 @@ class DataFetcher:
         return data
 
     def _filter_by_season(self, data: pd.DataFrame, season: int) -> pd.DataFrame:
+        if season == 0:
+            return data
         if season not in (1, 2, 3, 4):
             return data
         data = data.copy()

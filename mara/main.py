@@ -23,7 +23,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-i", "--indicators", required=True, help="Indicators, comma-separated")
     parser.add_argument("-s", "--start-date", dest="start_date", help="YYYY-MM-DD")
     parser.add_argument("-e", "--end-date", dest="end_date", help="YYYY-MM-DD")
-    parser.add_argument("--season", type=int, choices=[1, 2, 3, 4], default=4)
+    parser.add_argument("--season", type=int, choices=[0, 1, 2, 3, 4], default=4, help="Quarter (1-4); 0 means all quarters")
     parser.add_argument("--single", action="store_true", help="Use single-quarter (non-cumulative) values")
     parser.add_argument("--latest", action="store_true", help="Fetch latest data")
     parser.add_argument("-a", "--aggregate", choices=["mean", "median"], help="Aggregate quarterly data")

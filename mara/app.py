@@ -87,8 +87,8 @@ def _default_start() -> date:
 def _validate_options(options: QueryOptions) -> None:
     if options.latest and options.aggregate:
         raise ValueError("--latest and --aggregate cannot be used together")
-    if options.aggregate and options.season not in (1, 2, 3, 4):
-        raise ValueError("--aggregate requires a valid --season")
+    if options.aggregate and options.season not in (0, 1, 2, 3, 4):
+        raise ValueError("--aggregate requires a valid --season (0-4)")
 
 
 def _sort_tables(tables: list[OutputTable], sort_by: str, order: str) -> None:
