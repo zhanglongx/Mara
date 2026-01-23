@@ -57,6 +57,13 @@ class DataFetcher:
         latest: bool,
         aggregate: str | None,
     ) -> list[IndicatorResult]:
+        '''
+        Fetch financial indicators for multiple securities within a specified date range.
+        
+        This method retrieves indicator data from Tushare APIs and custom indicators.
+        It organizes requests by API endpoint to minimize network calls, handles custom
+        indicators separately, and applies filtering/aggregation based on user parameters.
+        '''
         indicator_list: list[str] = list(indicators)
         ts_code_list: list[str] = list(ts_codes)
         grouped: dict[str, list[str]] = {}
