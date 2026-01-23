@@ -17,7 +17,6 @@ class TushareClient:
     retry_delay: float = 60.0
 
     def __post_init__(self) -> None:
-        ts.set_token(self.token)
         self._pro: Any = ts.pro_api(self.token)
 
     def query(self, api_name: str, **params: Any) -> pd.DataFrame:
