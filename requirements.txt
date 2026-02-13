@@ -2,3 +2,4 @@ matplotlib==3.10.8
 pandas==3.0.0
 PyYAML==6.0.3
 tushare==1.4.24
+openpyxl==3.1.5
