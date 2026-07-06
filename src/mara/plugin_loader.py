@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import importlib.util
+from collections.abc import Callable
 from pathlib import Path
 from types import ModuleType
-from typing import Callable
 
 from mara.indicator_registry import IndicatorRegistry
 

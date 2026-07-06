@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import TypeAlias
-
 API_ORDER: list[str] = ["fina_indicator", "income", "balancesheet", "cashflow"]
 
 SINGLE_QUARTER_APIS: set[str] = {"income", "cashflow"}
@@ -13,7 +11,7 @@ BASIC_FIELDS: list[str] = ["ts_code", "name", "industry", "market", "area", "lis
 META_FIELDS: list[str] = ["ts_code", "ann_date", "end_date"]
 
 # (field_name, cn_name)
-ApiFieldSpec: TypeAlias = tuple[str, str]
+type ApiFieldSpec = tuple[str, str]
 
 EMBEDDED_API_FIELDS: dict[str, list[ApiFieldSpec]] = {
     "balancesheet": [

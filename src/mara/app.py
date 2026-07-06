@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Iterable
 
 from mara.config import AppConfig, load_config
 from mara.constants import API_ORDER
@@ -14,12 +14,12 @@ from mara.data_processor import DataProcessor, OutputTable
 from mara.date_utils import DateRange, to_date_range
 from mara.excel_exporter import ExcelExporter
 from mara.indicator_registry import IndicatorRegistry, load_registry
+from mara.output import print_tables
+from mara.plotter import plot_indicators
 from mara.plugin_loader import load_plugins
 from mara.query_options import QueryOptions
 from mara.stock_selector import StockSelection, select_stocks
 from mara.tushare_client import TushareClient
-from mara.output import print_tables
-from mara.plotter import plot_indicators
 
 
 @dataclass(frozen=True)

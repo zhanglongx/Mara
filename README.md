@@ -2,22 +2,36 @@
 
 Mara is an analysis and plotting tool that takes data from tushare and plots it through matplotlib.
 
-## Usage
+## Development Setup
 
-1. Prepare the ~/.mararc file(yaml syntax):
-
-```yaml
-  token: '<tushare token>'
-```
-2. run mara.py
+Use Python 3.12+ and the local `.venv` environment.
 
 ```bash
-	$ python3 mara.py [OPTIONS] [KEYWORD [KEYWORD ...]]
+./.venv/bin/pip install -e ".[dev]"
 ```
+
+## Usage
+
+1. Prepare the `~/.mararc` file (YAML syntax):
+
+```yaml
+token: "<tushare token>"
+```
+2. Install the package in your environment:
+
+```bash
+./.venv/bin/pip install -e .
+```
+3. Run the CLI:
+
+```bash
+mara [OPTIONS] [KEYWORD [KEYWORD ...]]
+```
+
 Example:
 
 ```bash
-	$ python3 mara.py -i roe,debt_to_assets -s 2020-01-01 -e 2023-01-01 000001.SZ 600000.SH
+mara -i roe,debt_to_assets -s 2020-01-01 -e 2023-01-01 000001.SZ 600000.SH
 ```
 
 ## About

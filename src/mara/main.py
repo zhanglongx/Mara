@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import argparse
 import logging
+import sys
+from collections.abc import Sequence
+from importlib.metadata import PackageNotFoundError, version
 
 from mara.app import run_app
 from mara.logger import (
@@ -13,7 +16,22 @@ from mara.logger import (
     setup_logging,
 )
 from mara.query_options import QueryOptions
-from mara.__version__ import __version__
+
+
+class VersionAction(argparse.Action):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: str | Sequence[object] | None,
+        option_string: str | None = None,
+    ) -> None:
+        del namespace, values, option_string
+        version_text: str = _get_version_text()
+        formatter: argparse.HelpFormatter = parser._get_formatter()
+        formatter.add_text(version_text)
+        parser._print_message(formatter.format_help(), sys.stdout)
+        parser.exit()
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -38,9 +56,22 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--delimiter", default=",", help="Output delimiter")
     parser.add_argument("-p", "--plot", action="store_true", help="Plot indicators")
     parser.add_argument("-c", "--config", dest="config_path", default="~/.mararc")
-    parser.add_argument("--version", action="version", version=f"mara {__version__}")
+    parser.add_argument(
+        "--version",
+        action=VersionAction,
+        nargs=0,
+        help="show program's version number and exit",
+    )
     parser.add_argument("--debug", action="store_true")
     return parser
+
+
+def _get_version_text() -> str:
+    try:
+        package_version: str = version("mara")
+    except PackageNotFoundError:
+        return "mara unknown"
+    return f"mara {package_version}"
 
 
 def _build_options(parsed: argparse.Namespace) -> QueryOptions:

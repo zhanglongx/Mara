@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -34,7 +34,7 @@ def plot_indicators(results: Iterable[IndicatorResult]) -> None:
     if len(specs) == 1:
         axes = [axes]
 
-    for axis, spec in zip(axes, specs):
+    for axis, spec in zip(axes, specs, strict=True):
         _plot_indicator(axis, spec)
 
     plt.tight_layout()
